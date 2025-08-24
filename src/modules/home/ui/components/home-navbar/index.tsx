@@ -1,10 +1,10 @@
 import Image from "next/image"
 import Link from "next/link"
 
-import { LoginButton } from "@/modules/auth/ui/components/login-button"
-import { SignupButton } from "@/modules/auth/ui/components/signup-button"
+import { AuthButton } from "@/modules/auth/ui/components/auth-button"
 
 import { SearchInput } from "./search-input"
+import { Button } from "@/components/ui/button"
 
 export const HomeNavbar = () => {
     return (
@@ -25,8 +25,21 @@ export const HomeNavbar = () => {
                 </div>
 
                 <div className="flex-shrink-0 items-center gap-4 space-x-2">
-                    <LoginButton />
-                    <SignupButton />
+                    <AuthButton href="/register">
+                        <Button
+                            variant="outline"
+                            className="px-4 py-2 text-sm font-medium
+                            bg-blue-500 text-white hover:text-white hover:bg-blue-600 rounded-md shadow-sm">
+                                Register
+                        </Button>
+                    </AuthButton>
+                    <AuthButton href="/login">
+                        <Button
+                            variant="outline"
+                            className="px-4 py-2 text-sm font-medium bg-white text-blue-600 hover:text-blue-600 hover:bg-blue-50 rounded-md shadow-sm">
+                                Log In
+                        </Button>
+                    </AuthButton>
                 </div>
             </div>
         </nav>
