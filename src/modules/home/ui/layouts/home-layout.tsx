@@ -1,22 +1,25 @@
-import { SidebarProvider } from "@/components/ui/sidebar";
+"use client";
 
-import { HomeNavbar } from "../components/home-navbar";
+import { useTRPC } from "@/trpc/client";
+import { useQuery } from "@tanstack/react-query";
+import { HomeNavbar } from "@/modules/home/ui/components/home-navbar";
+import { SearchProvider } from "@/modules/home/contexts/search-context";
 
-interface HomeLayoutProps {
-    children: React.ReactNode;
-}
+export const HomeLayout = ({ children }: { children: React.ReactNode }) => {
+    const trpc = useTRPC();
 
-export const HomeLayout = ({ children }: HomeLayoutProps) => {
-    return (
-        <SidebarProvider>
-            <div className="w-full">
-                <HomeNavbar />
-                <div className="flex min-h-screen pt-[4rem]">
-                    <main className="flex-1 overflow-y-auto">
-                        {children}
-                    </main>
-                </div>
-            </div>
-        </SidebarProvider>
+    const { data: user, isLoading } = useQuery(
+        trpc.user.getMyProfile.queryOptions()
     );
-}
+
+    return (
+        <SearchProvider>
+            <div className="min-h-screen bg-gray-50">
+                <HomeNavbar user={user} />
+                <main className="pt-16">
+                    {children}
+                </main>
+            </div>
+        </SearchProvider>
+    );
+};

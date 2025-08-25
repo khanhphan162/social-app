@@ -1,12 +1,13 @@
 "use client";
 
 import * as z from "zod";
-
-import axios from "axios";
-import { loginSchema } from "@/db/schema"
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
+
+import { loginSchema } from "@/db/schema"
 import { zodResolver } from "@hookform/resolvers/zod";
 
+import CardWrapper from "./card-wrapper"
 import {
     Form,
     FormControl,
@@ -14,16 +15,24 @@ import {
     FormItem,
     FormLabel,
     FormMessage
-} from "@/components/ui/form"
-import CardWrapper from "./card-wrapper"
-import { Input } from "@/components/ui/input"
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import { FormError } from "@/components/ui/form-error";
 import { FormSuccess } from "@/components/ui/form-success";
 
+import { useTRPC } from "@/trpc/client";
+import { useMutation } from "@tanstack/react-query";
+
 export const LoginForm = () => {
+    const trpc = useTRPC();
+    const mutation = useMutation(trpc.session.login.mutationOptions());
+
     const [isPending, startTransition] = useTransition();
+    const [error, setError] = useState("");
+    const [success, setSuccess] = useState("");
+    const router = useRouter();
 
     const form = useForm<z.infer<typeof loginSchema>>({
         resolver: zodResolver(loginSchema),
@@ -33,10 +42,35 @@ export const LoginForm = () => {
         }
     });
 
+    const loginMutation = useMutation(trpc.session.login.mutationOptions({
+        onSuccess: (data) => {
+            setSuccess("Login successful!");
+            setError("");
+
+            document.cookie = `sessionToken=${data.session.token}; path=/; secure; samesite=strict`;
+
+            setTimeout(() => {
+                router.push('/');
+            }, 1000);
+        },
+        onError: (error) => {
+            setError(error.message);
+            setSuccess("");
+        },
+    })
+    );
+
     const onSubmit = (values: z.infer<typeof loginSchema>) => {
         startTransition(() => {
-            //axios.post();
-        });
+            setError("");
+            setSuccess("");
+
+            loginMutation.mutate({
+                ...values,
+                ipAddress: undefined,
+                userAgent: navigator.userAgent,
+            });
+        })
     };
 
     return (
@@ -59,7 +93,7 @@ export const LoginForm = () => {
                                     <FormLabel>Username</FormLabel>
                                     <FormControl>
                                         <Input
-                                            disabled={isPending}
+                                            disabled={isPending || loginMutation.isPending}
                                             {...field}
                                             placeholder="Username"
                                         />
@@ -76,7 +110,7 @@ export const LoginForm = () => {
                                     <FormLabel>Password</FormLabel>
                                     <FormControl>
                                         <Input
-                                            disabled={isPending}
+                                            disabled={isPending || loginMutation.isPending}
                                             {...field}
                                             placeholder="******"
                                             type="password"
@@ -87,10 +121,10 @@ export const LoginForm = () => {
                             )}
                         />
                     </div>
-                    <FormError message=""/>
-                    <FormSuccess message=""/>
+                    <FormError message={error} />
+                    <FormSuccess message={success} />
                     <Button
-                        disabled={isPending}
+                        disabled={isPending || loginMutation.isPending}
                         type="submit"
                         className="w-full bg-blue-500 hover:bg-blue-600 cursor-pointer"
                     >

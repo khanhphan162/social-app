@@ -1,7 +1,8 @@
-import CreatePost from "@/modules/home/ui/components/home-navbar/create-post";
+import CreatePost from "@/modules/home/ui/components/post/create-post";
 import { PageClient } from "./client";
 import { Suspense } from "react";
 import { ErrorBoundary } from "react-error-boundary";
+import HomeContent from "@/modules/home/ui/components/home-content";
 
 export default async function Home() {
   const user = true;
@@ -9,12 +10,7 @@ export default async function Home() {
   return (
       <Suspense fallback={<p>Loading...</p>}>
         <ErrorBoundary fallback={<p>Error...</p>}>
-          <div className="grid grid-cols-1">
-            <div>
-              {user ? <CreatePost /> : null}
-            </div>
-          </div>
-          <PageClient />
+          <HomeContent/>
         </ErrorBoundary>
       </Suspense>
   );

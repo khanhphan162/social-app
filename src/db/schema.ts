@@ -132,3 +132,47 @@ export const editProfileSchema = z.object({
   name: z.string().min(1, { message: "Name is required." }),
   imageUrl: z.string().optional(),
 });
+
+// Post schemas
+export const createPostSchema = z.object({
+  body: z.string().min(1, { message: "Post content is required." }).max(500, { message: "Post content must be 500 characters or less." }),
+});
+
+export const updatePostSchema = z.object({
+  id: z.uuid(),
+  body: z.string().min(1, { message: "Post content is required." }).max(500, { message: "Post content must be 500 characters or less." }),
+});
+
+export const deletePostSchema = z.object({
+  id: z.uuid(),
+});
+
+export const getPostSchema = z.object({
+  id: z.uuid(),
+});
+
+// Comment schemas
+export const createCommentSchema = z.object({
+  body: z.string().min(1, { message: "Comment content is required." }).max(300, { message: "Comment content must be 300 characters or less." }),
+  postId: z.string().uuid(),
+});
+
+export const updateCommentSchema = z.object({
+  id: z.uuid(),
+  body: z.string().min(1, { message: "Comment content is required." }).max(300, { message: "Comment content must be 300 characters or less." }),
+});
+
+export const deleteCommentSchema = z.object({
+  id: z.uuid(),
+});
+
+// Search schema
+export const searchPostsSchema = z.object({
+  query: z.string().min(1, { message: "Search query is required." }),
+});
+
+// Timeline schema (for pagination)
+export const getTimelineSchema = z.object({
+  limit: z.number().min(1).max(50).optional().default(20),
+  cursor: z.uuid().optional(),
+});

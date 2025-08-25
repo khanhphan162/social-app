@@ -174,7 +174,8 @@ export const RegisterForm = () => {
                                     <Select
                                         disabled={isPending || registerMutation.isPending}
                                         onValueChange={field.onChange}
-                                        defaultValue="user"
+                                        value={field.value}
+                                        defaultValue={field.value}
                                     >
                                         <FormControl>
                                             <SelectTrigger className="w-full">
