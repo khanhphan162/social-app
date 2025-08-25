@@ -34,7 +34,6 @@ import { useMutation } from "@tanstack/react-query";
 
 export const RegisterForm = () => {
     const trpc = useTRPC();
-    const mutation = useMutation(trpc.session.register.mutationOptions());
 
     const [isPending, startTransition] = useTransition();
     const [error, setError] = useState("");

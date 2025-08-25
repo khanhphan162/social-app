@@ -27,7 +27,6 @@ import { useMutation } from "@tanstack/react-query";
 
 export const LoginForm = () => {
     const trpc = useTRPC();
-    const mutation = useMutation(trpc.session.login.mutationOptions());
 
     const [isPending, startTransition] = useTransition();
     const [error, setError] = useState("");

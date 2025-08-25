@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { TRPCProvider, TRPCReactProvider } from "@/trpc/client";
+import { TRPCReactProvider } from "@/trpc/client";
 import { SessionProvider } from "@/providers/session-provider";
+import { SearchProvider } from "@/modules/home/contexts/search-context";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,7 +24,9 @@ export default function RootLayout({
       >
         <TRPCReactProvider>
           <SessionProvider>
-            {children}
+            <SearchProvider>
+              {children}
+            </SearchProvider>
           </SessionProvider>
         </TRPCReactProvider>
       </body>

@@ -1,22 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTRPC } from "@/trpc/client";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-
-interface SessionData {
-  user: {
-    id: string;
-    username: string;
-    name: string;
-    role: string;
-    imageUrl?: string;
-  };
-  session: {
-    id: string;
-    token: string;
-    expiresAt: Date;
-  };
-}
+import { useEffect, useState, useCallback } from "react";
 
 // Enhanced cookie utilities
 const cookieUtils = {
@@ -53,7 +37,6 @@ const cookieUtils = {
 
 export const useSession = () => {
   const trpc = useTRPC();
-  const router = useRouter();
   const queryClient = useQueryClient();
   const [sessionToken, setSessionToken] = useState<string | null>(null);
   const [isInitialized, setIsInitialized] = useState(false);
@@ -72,7 +55,6 @@ export const useSession = () => {
     setIsInitialized(true);
   }, []);
 
-  // Query user profile if session exists
   const { 
     data: user, 
     isLoading: userLoading, 
@@ -81,45 +63,40 @@ export const useSession = () => {
   } = useQuery({
     ...trpc.user.getMyProfile.queryOptions(),
     enabled: !!sessionToken && isInitialized,
-    retry: (failureCount, error: any) => {
-      console.log('🔄 User query retry:', { failureCount, error: error?.message });
+    retry: (failureCount, error: unknown) => {
+      console.log('🔄 User query retry:', { failureCount, error: (error as Error)?.message });
       
       // Don't retry if it's an authentication error
-      if (error?.message?.includes('UNAUTHORIZED') || 
+      if ((error as Error)?.message?.includes('UNAUTHORIZED') || 
           error?.message?.includes('unauthorized') || 
           error?.message?.includes('authentication')) {
         console.log('❌ Authentication error - not retrying');
         return false;
       }
       return failureCount < 2;
-    },
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    }
   });
 
   console.log('👤 User query state:', { 
     hasUser: !!user, 
-    userLoading, 
+    userLoading,
     userError: userError?.message, 
     hasSessionToken: !!sessionToken,
     isInitialized 
   });
 
-  // Query user sessions
   const { 
     data: sessions, 
-    isLoading: sessionsLoading,
     refetch: refetchSessions 
   } = useQuery({
     ...trpc.session.getUserSessions.queryOptions(),
     enabled: !!sessionToken && !!user,
-    staleTime: 10 * 60 * 1000, // 10 minutes
-    retry: (failureCount, error: any) => {
-      console.log('🔄 Sessions query retry:', { failureCount, error: error?.message });
+    retry: (failureCount, error: unknown) => {
+      console.log('🔄 Sessions query retry:', { failureCount, error: (error as Error)?.message });
       return failureCount < 2;
     }
   });
 
-  // Refresh session mutation
   const refreshSessionMutation = useMutation({
     ...trpc.session.refreshSession.mutationOptions({
       onSuccess: (data) => {
@@ -157,8 +134,8 @@ export const useSession = () => {
     }),
   });
 
-  // Enhanced logout handler
-  const handleLogout = () => {
+  // Enhanced logout handler with useCallback
+  const handleLogout = useCallback(() => {
     console.log('🔄 Handling logout...');
     
     // Clear cookie
@@ -169,7 +146,20 @@ export const useSession = () => {
     
     // Reset state
     setSessionToken(null);
-  };
+    setIsInitialized(true);
+  }, [queryClient]);
+
+  // Refresh session function with useCallback
+  const refreshSession = useCallback(async () => {
+    try {
+      console.log('🔄 Refreshing session...');
+      await refetchUser();
+      await refetchSessions();
+    } catch (error) {
+      console.error('❌ Failed to refresh session:', error);
+      handleLogout();
+    }
+  }, [refetchUser, refetchSessions, handleLogout]);
 
   // Logout from current session
   const logout = () => {
@@ -196,19 +186,6 @@ export const useSession = () => {
       });
     } else {
       handleLogout();
-    }
-  };
-
-  // Refresh current session
-  const refreshSession = () => {
-    console.log('🔄 Initiating session refresh...');
-    
-    if (sessions && sessions.length > 0) {
-      refreshSessionMutation.mutate({
-        sessionId: sessions[0].id,
-      });
-    } else {
-      console.log('❌ No sessions available to refresh');
     }
   };
 
@@ -239,7 +216,7 @@ export const useSession = () => {
         handleLogout();
       }
     }
-  }, [sessions]);
+  }, [sessions, handleLogout, refreshSession]);
 
   // Handle authentication errors
   useEffect(() => {
@@ -251,7 +228,7 @@ export const useSession = () => {
         handleLogout();
       }
     }
-  }, [userError, sessionToken, isInitialized]);
+  }, [userError, sessionToken, isInitialized, handleLogout]);
 
   return {
     user,
@@ -265,6 +242,7 @@ export const useSession = () => {
     refreshSession,
     refetchUser,
     refetchSessions,
+    handleLogout,
     isRefreshing: refreshSessionMutation.isPending,
     isLoggingOut: logoutMutation.isPending,
     isInitialized,

@@ -1,7 +1,7 @@
 import { protectedProcedure, createTRPCRouter } from "../init";
 import { z } from "zod";
 import { and, count, desc, eq } from "drizzle-orm";
-import { comments as commentTable, posts as postTable, users as userTable } from "@/db/schema";
+import { comments as commentTable, posts as postTable } from "@/db/schema";
 import { createCommentSchema, updateCommentSchema, deleteCommentSchema } from "@/db/schema";
 
 const commentRouter = createTRPCRouter({

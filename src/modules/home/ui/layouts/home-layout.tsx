@@ -8,7 +8,7 @@ import { SearchProvider } from "@/modules/home/contexts/search-context";
 export const HomeLayout = ({ children }: { children: React.ReactNode }) => {
     const trpc = useTRPC();
 
-    const { data: user, isLoading } = useQuery(
+    const { data: user } = useQuery(
         trpc.user.getMyProfile.queryOptions()
     );
 

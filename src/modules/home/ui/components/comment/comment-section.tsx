@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useTRPC } from "@/trpc/client";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -24,21 +24,46 @@ interface CommentSectionProps {
     };
 }
 
+// Add proper type definitions
+interface Comment {
+  id: string;
+  body: string;
+  createdAt: Date;
+  updatedAt: Date;
+  user: {
+    id: string;
+    name: string;
+    username: string;
+    imageUrl?: string | null;
+  };
+  postId: string;
+  userId: string;
+  editedBy: string | null;
+  isEditedByAdmin: boolean | null;
+  isDeleted: boolean | null;
+  editor?: {
+    id: string;
+    name: string;
+    username: string;
+    imageUrl?: string | null;
+  } | null;
+}
+
 export const CommentSection = ({ postId, currentUser }: CommentSectionProps) => {
     const [newComment, setNewComment] = useState("");
-    const [editingComment, setEditingComment] = useState<any>(null);
+    const [editingComment, setEditingComment] = useState<Comment | null>(null);
     const [deletingCommentId, setDeletingCommentId] = useState<string | null>(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [showAllComments, setShowAllComments] = useState(false);
-    const [allLoadedComments, setAllLoadedComments] = useState<any[]>([]);
+    const [allLoadedComments, setAllLoadedComments] = useState<Comment[]>([]);
     const [hasLoadedPrevious, setHasLoadedPrevious] = useState(false);
     const [isCollapsed, setIsCollapsed] = useState(true);
     
     const trpc = useTRPC();
     const queryClient = useQueryClient();
 
-    // Fetch comments
-    const { data: commentsData, isLoading } = useQuery(
+    // Fetch comments with refetch function
+    const { data: commentsData, isLoading, refetch: refetchComments } = useSuspenseQuery(
         trpc.comment.getComments.queryOptions({
             postId,
             page: currentPage,
@@ -68,17 +93,11 @@ export const CommentSection = ({ postId, currentUser }: CommentSectionProps) => 
         trpc.comment.createComment.mutationOptions({
             onSuccess: () => {
                 setNewComment("");
-                // Invalidate comments for this specific post
-                queryClient.invalidateQueries({ 
-                    queryKey: ['comment', 'getComments', { postId }] 
-                });
-                // Also invalidate the posts query to update comment counts if needed
-                queryClient.invalidateQueries({ 
-                    queryKey: ['post', 'getPosts'] 
-                });
+                // Refetch comments instead of invalidation
+                refetchComments();
             },
             onError: (error) => {
-                console.error('Failed to create comment:', error);
+                console.error('❌ Failed to create comment:', error);
             },
         })
     );
@@ -87,13 +106,12 @@ export const CommentSection = ({ postId, currentUser }: CommentSectionProps) => 
     const deleteCommentMutation = useMutation(
         trpc.comment.deleteComment.mutationOptions({
             onSuccess: () => {
-                // Invalidate comments for this specific post
-                queryClient.invalidateQueries({ 
-                    queryKey: ['comment', 'getComments', { postId }] 
-                });
-                // Also invalidate the posts query to update comment counts if needed
-                queryClient.invalidateQueries({ 
-                    queryKey: ['post', 'getPosts'] 
+                // Refetch comments instead of invalidation
+                refetchComments();
+                // Also refetch posts to update comment counts
+                queryClient.refetchQueries({ 
+                    queryKey: ['post', 'getPosts'],
+                    type: 'active'
                 });
                 setDeletingCommentId(null);
             },
@@ -104,6 +122,7 @@ export const CommentSection = ({ postId, currentUser }: CommentSectionProps) => 
     );
 
     const handleSubmitComment = async () => {
+        console.log("Comment submitted");
         if (!newComment.trim()) return;
 
         createCommentMutation.mutate({
@@ -112,7 +131,7 @@ export const CommentSection = ({ postId, currentUser }: CommentSectionProps) => 
         });
     };
 
-    const handleEditComment = (comment: any) => {
+    const handleEditComment = (comment: Comment) => {
         setEditingComment(comment);
     };
 
@@ -373,10 +392,6 @@ export const CommentSection = ({ postId, currentUser }: CommentSectionProps) => 
                     comment={editingComment}
                     isOpen={!!editingComment}
                     onClose={() => setEditingComment(null)}
-                    onSuccess={() => {
-                        queryClient.invalidateQueries({ queryKey: ['comment', 'getComments'] });
-                        setEditingComment(null);
-                    }}
                 />
             )}
 

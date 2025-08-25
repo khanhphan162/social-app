@@ -6,9 +6,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Loader2Icon, SendIcon } from "lucide-react";
 import { useState } from "react";
-
 import { useTRPC } from "@/trpc/client";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useSearch } from "@/modules/home/contexts/search-context";
 
 interface CreatePostProps {
     user: {
@@ -22,13 +22,22 @@ interface CreatePostProps {
 const CreatePost = ({ user }: CreatePostProps) => {
     const [content, setContent] = useState("");
     const trpc = useTRPC();
-    const queryClient = useQueryClient();
+    const { searchQuery } = useSearch();
+
+    // Get refetch function from getPosts query
+    const { refetch: refetchPosts } = useQuery(
+        trpc.post.getPosts.queryOptions({
+            page: 1,
+            limit: 10,
+            search: searchQuery || undefined,
+        })
+    );
 
     const createPostMutation = useMutation(trpc.post.createPost.mutationOptions({
         onSuccess: () => {
             setContent("");
-            // Invalidate and refetch posts query
-            queryClient.invalidateQueries({ queryKey: ['post', 'getPosts'] });
+            // Refetch posts after successful creation
+            refetchPosts();
         },
         onError: (error) => {
             console.error('Failed to create post:', error);

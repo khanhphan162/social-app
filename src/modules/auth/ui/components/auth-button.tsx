@@ -13,7 +13,6 @@ export const AuthButton = ({
     children,
     href,
     mode = "redirect",
-    asChild
 }: AuthButtonProps) => {
     const route = useRouter();
 

@@ -3,7 +3,8 @@ import * as schema from "@/db/schema";
 import dotenv from "dotenv";
 import { drizzle } from "drizzle-orm/neon-http";
 import { eq, and, gt } from "drizzle-orm";
-import { users, sessions } from "@/db/schema";
+import { sessions } from "@/db/schema";
+import { FastifyRequest } from 'fastify';
 
 dotenv.config({path: ".env.local"});
 
@@ -15,7 +16,8 @@ const config = { databaseUrl };
 export const db = drizzle(databaseUrl, { schema });
 
 // Helper function to safely get headers from different request types
-const getHeaders = (req: any) => {
+// Fix the any type on line 18
+const getHeaders = (req: FastifyRequest | Request) => {
   console.log('🔍 Request object type:', typeof req, 'keys:', Object.keys(req));
   
   // For standard Request objects (Fetch API)
@@ -192,6 +194,68 @@ const createTRPCContext = async ({ req }: FetchCreateContextFnOptions) => {
     return { req, db, config, user: null, session: null };
   }
 };
+
+// const createContext = async (opts: { req: FastifyRequest; res: FastifyReply }) => {
+//   console.log('🚀 Creating tRPC context...');
+  
+//   try {
+//     const headers = getHeaders(opts.req);
+    
+//     console.log('🔍 Headers extracted:', {
+//       hasAuthHeader: !!headers.authorization,
+//       hasCookieHeader: !!headers.cookie,
+//       cookiePreview: headers.cookie ? headers.cookie.substring(0, 100) + '...' : 'none'
+//     });
+    
+//     let token: string | null = null;
+    
+//     // Try Authorization header first (Bearer token)
+//     if (headers.authorization?.startsWith('Bearer ')) {
+//       token = headers.authorization.slice(7);
+//       console.log('📋 Token from Authorization header');
+//     } 
+//     // Then try cookie
+//     else if (headers.cookie) {
+//       const cookies = headers.cookie.split(';').map(cookie => cookie.trim());
+//       const sessionCookie = cookies.find(cookie => cookie.startsWith('sessionToken='));
+      
+//       console.log('🍪 Available cookies:', cookies.map(c => c.split('=')[0]));
+      
+//       if (sessionCookie) {
+//         token = decodeURIComponent(sessionCookie.split('=')[1]);
+//         console.log('🍪 Token from cookie found, length:', token.length);
+//       } else {
+//         console.log('🍪 No sessionToken cookie found');
+//       }
+//     }
+
+//     if (!token) {
+//       console.log('❌ No authentication token found in request');
+//       return { req: opts.req, db, config, user: null, session: null };
+//     }
+
+//     console.log('🔑 Attempting to verify token...');
+//     const authData = await verifySessionToken(token);
+    
+//     if (authData) {
+//       console.log('✅ Authentication successful for user:', authData.user.username);
+//       return { 
+//         req: opts.req, 
+//         user: authData.user, 
+//         session: authData.session,
+//         db, 
+//         config 
+//       };
+//     } else {
+//       console.log('❌ Authentication failed - invalid session');
+//       return { req, db, config, user: null, session: null };
+//     }
+//   } catch (error) {
+//     console.error("❌ Context creation error:", error);
+//     console.error("❌ Error stack:", error.stack);
+//     return { req, db, config, user: null, session: null };
+//   }
+// };
 
 export type Context = Awaited<ReturnType<typeof createTRPCContext>>;
 export default createTRPCContext;

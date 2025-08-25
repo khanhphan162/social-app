@@ -87,7 +87,7 @@ export default function ProfilePage() {
         return (
             <div className="text-center py-8">
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">User Not Found</h2>
-                <p className="text-gray-600">The user you're looking for doesn't exist.</p>
+                <p className="text-gray-600">The user you&apos;re looking for doesn&apos;t exist.</p>
             </div>
         );
     }

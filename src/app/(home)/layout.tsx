@@ -2,9 +2,6 @@
 
 import { HomeNavbar } from "@/modules/home/ui/components/home-navbar";
 import { LoadingSpinner } from "@/components/ui/loading-spinner";
-import { SearchProvider } from "@/modules/home/contexts/search-context";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
 import { useSessionContext } from "@/providers/session-provider";
 
 interface HomeLayoutProps {
@@ -14,25 +11,13 @@ interface HomeLayoutProps {
 const HomeLayout = ({ children }: HomeLayoutProps) => {
     const { 
         user, 
-        isLoading, 
-        isAuthenticated, 
-        error,
+        isLoading,
         logout,
         logoutAll,
         sessions,
         isRefreshing 
     } = useSessionContext();
     
-    const router = useRouter();
-
-    // Remove the automatic redirect - let individual pages handle authentication
-    // useEffect(() => {
-    //     if (!isLoading && !isAuthenticated && !error) {
-    //         router.push('/login');
-    //     }
-    // }, [isLoading, isAuthenticated, error, router]);
-
-    // Show loading spinner only while actively checking authentication
     if (isLoading) {
         return (
             <div className="min-h-screen flex items-center justify-center">
@@ -41,9 +26,7 @@ const HomeLayout = ({ children }: HomeLayoutProps) => {
         );
     }
 
-    // Always render the layout, regardless of authentication status
     return (
-        <SearchProvider>
             <div className="w-full">
                 {user ? (
                     <HomeNavbar 
@@ -63,7 +46,6 @@ const HomeLayout = ({ children }: HomeLayoutProps) => {
                     </main>
                 </div>
             </div>
-        </SearchProvider>
     );
 };
 

@@ -1,36 +1,221 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Social Media Application
 
-## Getting Started
+A modern full-stack social media application built with Next.js, Fastify, tRPC, and PostgreSQL.
 
-First, run the development server:
+## 🚀 Features
+
+- **User Authentication**: Secure authentication with Better Auth
+- **Post Management**: Create, edit, delete, and view posts
+- **Comment System**: Interactive commenting with real-time updates
+- **Search Functionality**: Search posts by content and username
+- **Admin Features**: Content moderation and user management
+- **Profile Management**: User profile customization
+- **Responsive Design**: Mobile-first design with Tailwind CSS
+- **Real-time Updates**: Live updates using tRPC subscriptions
+
+## 🛠️ Tech Stack
+
+### Frontend
+- **Next.js 15** - React framework with App Router
+- **React 19** - UI library
+- **TypeScript** - Type safety
+- **Tailwind CSS** - Styling
+- **Shadcn/ui** - UI components
+- **Lucide React** - Icons
+- **TanStack Query** - Data fetching and caching
+- **tRPC** - End-to-end typesafe APIs
+
+### Backend
+- **Fastify** - Fast and efficient web framework
+- **tRPC** - Type-safe API layer
+- **Better Auth** - Authentication system
+- **Drizzle ORM** - Type-safe database toolkit
+- **PostgreSQL** - Database (via Neon)
+- **Zod** - Schema validation
+
+### Development Tools
+- **ESLint** - Code linting
+- **TypeScript** - Static type checking
+- **Drizzle Kit** - Database migrations
+- **TSX** - TypeScript execution
+
+## 📋 Prerequisites
+
+- Node.js 18+ 
+- pnpm (recommended) or npm
+- PostgreSQL database (Neon recommended)
+
+## 🚀 Getting Started
+
+### 1. Clone the repository
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <repository-url>
+cd social-app
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Install dependencies
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+pnpm install
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 3. Environment Setup
 
-## Learn More
+Copy the environment template:
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+cp .env.sample .env.local
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Fill in your environment variables in `.env.local` (see Environment Variables section below).
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 4. Database Setup
 
-## Deploy on Vercel
+Generate and push database schema:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+pnpm db:generate
+pnpm db:push
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### 5. Development
+
+Start the development servers:
+
+```bash
+# Terminal 1 - Backend server
+pnpm dev:server
+
+# Terminal 2 - Frontend server
+pnpm dev:client
+```
+
+The application will be available at:
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:4000
+
+## 🔧 Environment Variables
+
+Create a `.env.local` file in the root directory with the following variables:
+
+```env
+# Database
+DATABASE_URL="postgresql://username:password@host:port/database"
+
+# Server Configuration
+PORT=4000
+FRONTEND_URL="http://localhost:3000"
+BACKEND_URL="http://localhost:4000"
+
+```
+
+## 📜 Available Scripts
+
+### Development
+- `pnpm dev:server` - Start backend development server
+- `pnpm dev:client` - Start frontend development server
+
+### Building
+- `pnpm build:server` - Build backend for production
+- `pnpm build:front` - Build frontend for production
+
+### Production
+- `pnpm start:server` - Start production backend server
+- `pnpm start:client` - Start production frontend server
+
+### Database
+- `pnpm db:generate` - Generate database migrations
+- `pnpm db:push` - Push schema changes to database
+- `pnpm db:migrate` - Run database migrations
+- `pnpm db:studio` - Open Drizzle Studio (database GUI)
+
+### Code Quality
+- `pnpm lint` - Run ESLint
+
+## 🏗️ Project Structure
+src/
+├── app/                    # Next.js App Router
+│   ├── (auth)/            # Authentication pages
+│   ├── (home)/            # Main application pages
+│   └── layout.tsx         # Root layout
+├── components/            # Reusable UI components
+│   └── ui/               # Shadcn/ui components
+├── db/                   # Database configuration
+│   ├── index.ts          # Database connection
+│   └── schema.ts         # Database schema
+├── hooks/                # Custom React hooks
+├── lib/                  # Utility libraries
+├── modules/              # Feature modules
+│   ├── auth/            # Authentication module
+│   └── home/            # Home/feed module
+├── providers/           # React context providers
+├── server/              # Backend server code
+│   ├── api/            # API handlers
+│   ├── handlers/       # Route handlers
+│   ├── lib/           # Server utilities
+│   ├── router/        # tRPC routers
+│   └── index.ts       # Server entry point
+└── trpc/               # tRPC client configuration
+
+
+## 🔐 Authentication
+
+- Username-based authentication
+- Session management
+- Role-based access control (user/admin)
+- Secure password hashing
+
+## 🗄️ Database Schema
+
+The application uses PostgreSQL with the following main entities:
+- **Users**: User accounts and profiles
+- **Posts**: User posts/content
+- **Comments**: Post comments
+- **Sessions**: Authentication sessions
+
+## 🚀 Deployment
+
+### Backend Deployment
+1. Build the server: `pnpm build:server`
+2. Set production environment variables
+3. Run migrations: `pnpm db:migrate`
+4. Start the server: `pnpm start:server`
+
+### Frontend Deployment
+1. Build the frontend: `pnpm build:front`
+2. Deploy to your preferred platform (Vercel, Netlify, etc.)
+3. Update environment variables for production URLs
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/amazing-feature`
+3. Commit your changes: `git commit -m 'Add amazing feature'`
+4. Push to the branch: `git push origin feature/amazing-feature`
+5. Open a Pull Request
+
+## 📝 License
+
+This project is licensed under the MIT License.
+
+## 🐛 Troubleshooting
+
+### Common Issues
+
+1. **Database Connection Issues**
+   - Verify your `DATABASE_URL` is correct
+   - Ensure your database is running and accessible
+   - Check firewall settings
+
+2. **CORS Errors**
+   - Verify `FRONTEND_URL` and `BACKEND_URL` are correctly set
+   - Ensure both servers are running on the specified ports
+
+3. **Build Errors**
+   - Clear node_modules and reinstall: `rm -rf node_modules && pnpm install`
+   - Check TypeScript errors: `pnpm tsc --noEmit`
+
+## 📞 Support
+
+If you encounter any issues or have questions, please open an issue on GitHub.

@@ -1,7 +1,7 @@
 import { protectedProcedure, createTRPCRouter } from "../init";
 import { z } from "zod";
-import { and, or, desc, ilike, eq, count, isNull } from "drizzle-orm";
-import { posts as postTable, users as userTable } from "@/db/schema";
+import { and, desc, ilike, eq, count } from "drizzle-orm";
+import { posts as postTable } from "@/db/schema";
 
 const postRouter = createTRPCRouter({
   createPost: protectedProcedure

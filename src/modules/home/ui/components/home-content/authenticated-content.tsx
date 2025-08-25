@@ -8,7 +8,7 @@ import CreatePost from "../post/create-post";
 import { PostCard } from "../post/post-card";
 import { CommentSection } from "../comment/comment-section";
 import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
+import { Loader2, SearchIcon } from "lucide-react";
 import { EditPostDialog } from "../post/edit-post-dialog";
 import { DeleteConfirmDialog } from "../post/delete-confirm-dialog";
 
@@ -22,22 +22,42 @@ interface AuthenticatedContentProps {
     };
 }
 
+interface Post {
+    id: string;
+    body: string;
+    createdAt: Date;
+    updatedAt: Date;
+    isEditedByAdmin?: boolean;
+    isDeleted?: boolean;
+    editedBy: string | null;
+    user: {
+        id: string;
+        name: string;
+        username: string;
+        imageUrl?: string;
+        role?: string;
+    };
+    editor?: {
+        id: string;
+        name: string;
+        username: string;
+    } | null;
+}
+
 const AuthenticatedContent = ({ user }: AuthenticatedContentProps) => {
     const [currentPage, setCurrentPage] = useState(1);
-    const [editingPost, setEditingPost] = useState<any>(null);
+
+    const [editingPost, setEditingPost] = useState<Post | null>(null);
     const [deletingPostId, setDeletingPostId] = useState<string | null>(null);
-    const [expandedComments, setExpandedComments] = useState<Set<string>>(new Set());
-    
+
     const { searchQuery } = useSearch();
     const trpc = useTRPC();
     const queryClient = useQueryClient();
 
-    // Reset page when search changes
     useEffect(() => {
         setCurrentPage(1);
     }, [searchQuery]);
 
-    // Fetch posts with unified search (searches both content and username)
     const { data: postsData, isLoading, error } = useQuery(
         trpc.post.getPosts.queryOptions({
             page: currentPage,
@@ -46,7 +66,6 @@ const AuthenticatedContent = ({ user }: AuthenticatedContentProps) => {
         })
     );
 
-    // Delete post mutation
     const deletePostMutation = useMutation(
         trpc.post.deletePost.mutationOptions({
             onSuccess: () => {
@@ -65,24 +84,13 @@ const AuthenticatedContent = ({ user }: AuthenticatedContentProps) => {
         }
     };
 
-    const toggleComments = (postId: string) => {
-        const newExpanded = new Set(expandedComments);
-        if (expandedComments.has(postId)) {
-            newExpanded.delete(postId);
-        } else {
-            newExpanded.add(postId);
-        }
-        setExpandedComments(newExpanded);
-    };
-
-    // Add restore post mutation
     const restorePostMutation = useMutation(
         trpc.post.restorePost.mutationOptions({
             onSuccess: () => {
                 queryClient.invalidateQueries({ queryKey: ['post', 'getPosts'] });
                 if (searchQuery) {
-                    queryClient.invalidateQueries({ 
-                        queryKey: ['post', 'searchPosts', { query: searchQuery }] 
+                    queryClient.invalidateQueries({
+                        queryKey: ['post', 'searchPosts', { query: searchQuery }]
                     });
                 }
             },
@@ -91,7 +99,7 @@ const AuthenticatedContent = ({ user }: AuthenticatedContentProps) => {
             },
         })
     );
-    
+
     const handleRestorePost = (postId: string) => {
         restorePostMutation.mutate({ id: postId });
     };
@@ -118,17 +126,17 @@ const AuthenticatedContent = ({ user }: AuthenticatedContentProps) => {
             {searchQuery && (
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                     <h2 className="text-lg font-semibold text-blue-800">
-                        Search results for "{searchQuery}"
+                        Search results for &quot;{searchQuery}&quot;
                     </h2>
                     <p className="text-sm text-blue-600 mt-1">
                         Showing posts matching content or username
                     </p>
                 </div>
             )}
-            
+
             {/* Create post form (only show when not searching) */}
             {!searchQuery && <CreatePost user={user} />}
-            
+
             {/* Posts */}
             {postsData?.posts.length === 0 ? (
                 <div className="text-center py-12">
@@ -138,11 +146,7 @@ const AuthenticatedContent = ({ user }: AuthenticatedContentProps) => {
                     <h3 className="text-lg font-medium text-gray-900 mb-2">
                         {searchQuery ? 'No posts found' : 'No posts yet'}
                     </h3>
-                    <p className="text-gray-500">
-                        {searchQuery 
-                            ? `No posts found matching "${searchQuery}"` 
-                            : "Be the first to share something!"}
-                    </p>
+                    <p className="text-gray-500 text-center py-4">No posts found matching &quot;{searchQuery}&quot;.</p>
                 </div>
             ) : (
                 <div className="space-y-6">

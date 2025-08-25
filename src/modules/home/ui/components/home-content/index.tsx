@@ -1,15 +1,11 @@
 "use client"
 
-import { useState } from "react";
 import { useSession } from "@/hooks/use-session";
 import AuthenticatedContent from "./authenticated-content";
 
 const HomeContent = () => {
-    const [searchQuery, setSearchQuery] = useState("");
-    const [currentPage, setCurrentPage] = useState(1);
-    const { user, isLoading, isInitialized } = useSession();
+    const { user, isLoading } = useSession();
 
-    // Show loading only while actively loading user data (not during initialization)
     if (isLoading) {
         return (
             <div className="flex items-center justify-center min-h-screen">
@@ -18,7 +14,6 @@ const HomeContent = () => {
         );
     }
 
-    // Show welcome page for unauthenticated users (after initialization)
     if (!user) {
         return (
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -48,8 +43,6 @@ const HomeContent = () => {
         );
     }
 
-    // Show authenticated content for logged-in users
-    // Convert imageUrl from string | null to string | undefined for compatibility
     const userForAuth = {
         ...user,
         imageUrl: user.imageUrl ?? undefined

@@ -21,20 +21,20 @@ import { useTRPC } from "@/trpc/client"
 import { useMutation } from "@tanstack/react-query"
 import { AuthButton } from "@/modules/auth/ui/components/auth-button";
 
+interface User {
+    id: string;
+    name: string;
+    username: string;
+    imageUrl?: string;
+    role: string;
+}
+
 interface HomeNavbarProps {
-    user?: any;
-    onLogout?: () => void;
-    onLogoutAll?: () => void;
-    sessions?: any[];
-    isRefreshing?: boolean;
+    user?: User;
 }
 
 export const HomeNavbar = ({
-    user,
-    onLogout,
-    onLogoutAll,
-    sessions,
-    isRefreshing
+    user
 }: HomeNavbarProps) => {
     const router = useRouter();
     const trpc = useTRPC();

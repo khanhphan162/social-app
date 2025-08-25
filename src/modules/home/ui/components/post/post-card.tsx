@@ -1,6 +1,6 @@
 "use client";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { 
@@ -9,7 +9,7 @@ import {
     DropdownMenuItem, 
     DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Edit, Trash2, Shield, RotateCcw, Crown, MessageCircle, Repeat2, Heart, Share } from "lucide-react";
+import { MoreHorizontal, Edit, Trash2, Shield, RotateCcw, Crown } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
 interface Post {
@@ -52,7 +52,6 @@ export const PostCard = ({
     onEdit,
     onDelete,
     onRestore,
-    onToggleExpanded,
 }: PostCardProps) => {
     const getInitials = (name: string) => {
         return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
@@ -122,7 +121,7 @@ export const PostCard = ({
                                 <>
                                     <span className="text-gray-500 text-sm">·</span>
                                     <span className="flex items-center text-gray-500 text-sm">
-                                        {post.isEditedByAdmin && <Shield className="h-3 w-3 mr-1" />}
+                                        {post.isEditedByAdmin && (<Shield className="h-3 w-3 mr-1" />)}
                                         edited
                                         {post.editor && post.editor.id !== post.user.id && (
                                             <span className="ml-1">by @{post.editor.username}</span>

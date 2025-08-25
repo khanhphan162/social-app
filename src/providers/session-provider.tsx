@@ -3,13 +3,27 @@
 import { useSession } from '@/hooks/use-session';
 import React, { createContext, useContext, ReactNode } from 'react';
 
+interface User {
+    id: string;
+    name: string;
+    username: string;
+    imageUrl?: string;
+    role: string;
+}
+
+interface Session {
+    id: string;
+    token: string;
+    expiresAt: Date;
+}
+
 interface SessionContextType {
-    user: any;
-    sessions: any[] | undefined;
+    user: User | null;
+    sessions: Session[] | undefined;
     sessionToken: string | null;
     isLoading: boolean;
     isAuthenticated: boolean;
-    error: any;
+    error: Error | null;
     logout: () => void;
     logoutAll: () => void;
     refreshSession: () => void;
