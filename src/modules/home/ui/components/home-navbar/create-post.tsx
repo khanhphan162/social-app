@@ -46,12 +46,12 @@ const CreatePost = () => {
                         >
                             {isPosting ? (
                                 <>
-                                    <Loader2Icon className="size-4 mr-2 animate-spin" />
+                                    <Loader2Icon className="h-4 w-4 mr-2 animate-spin" />
                                     Posting...
                                 </>
                             ) : (
                                 <>
-                                    <SendIcon className="size-4 mr-2" />
+                                    <SendIcon className="h-4 w-4 mr-2" />
                                     Post
                                 </>
                             )}

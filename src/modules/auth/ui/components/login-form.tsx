@@ -2,6 +2,7 @@
 
 import * as z from "zod";
 
+import axios from "axios";
 import { loginSchema } from "@/db/schema"
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -17,10 +18,12 @@ import {
 import CardWrapper from "./card-wrapper"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
+import { useTransition } from "react";
+import { FormError } from "@/components/ui/form-error";
+import { FormSuccess } from "@/components/ui/form-success";
 
 export const LoginForm = () => {
-    const [loading, setLoading] = useState(false);
+    const [isPending, startTransition] = useTransition();
 
     const form = useForm<z.infer<typeof loginSchema>>({
         resolver: zodResolver(loginSchema),
@@ -31,20 +34,15 @@ export const LoginForm = () => {
     });
 
     const onSubmit = (values: z.infer<typeof loginSchema>) => {
-        try {
-            setLoading(true);
-            console.log(values);
-        } catch (error) {
-            console.log(error);
-        } finally {
-            setLoading(false);
-        }
-    }
+        startTransition(() => {
+            //axios.post();
+        });
+    };
 
     return (
         <CardWrapper
             headerLabel="Log In"
-            backButtonLabel="Don't have an account?"
+            backButtonLabel="Don't have an account? Sign up."
             backButtonHref="/register"
         >
             <Form {...form}>
@@ -61,7 +59,7 @@ export const LoginForm = () => {
                                     <FormLabel>Username</FormLabel>
                                     <FormControl>
                                         <Input
-                                            disabled={loading}
+                                            disabled={isPending}
                                             {...field}
                                             placeholder="Username"
                                         />
@@ -78,7 +76,7 @@ export const LoginForm = () => {
                                     <FormLabel>Password</FormLabel>
                                     <FormControl>
                                         <Input
-                                            disabled={loading}
+                                            disabled={isPending}
                                             {...field}
                                             placeholder="******"
                                             type="password"
@@ -89,8 +87,10 @@ export const LoginForm = () => {
                             )}
                         />
                     </div>
+                    <FormError message=""/>
+                    <FormSuccess message=""/>
                     <Button
-                        disabled={loading}
+                        disabled={isPending}
                         type="submit"
                         className="w-full bg-blue-500 hover:bg-blue-600 cursor-pointer"
                     >

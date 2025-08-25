@@ -1,13 +1,20 @@
-'use client';
+"use client";
+
 // ^-- to make sure we can mount the Provider from a server component
-import type { QueryClient } from '@tanstack/react-query';
+import type { QueryClient, QueryClientProviderProps } from '@tanstack/react-query';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { createTRPCClient, httpBatchLink } from '@trpc/client';
-import { createTRPCContext } from '@trpc/tanstack-react-query';
-import { useState } from 'react';
-import { makeQueryClient } from './query-client';
-import type { AppRouter } from './routers/_app';
-export const { TRPCProvider, useTRPC } = createTRPCContext<AppRouter>();
+import { createTRPCContext } from "@trpc/tanstack-react-query";
+import { useState } from "react";
+// import { inferRouterOutputs } from "@trpc/server";
+import { makeQueryClient } from "./query-client";
+import type { AppRouter } from "@/server/router";
+import superjson from 'superjson';
+
+export const { TRPCProvider, useTRPC } = createTRPCContext<AppRouter>()
+
+// export type RouterOutput = inferRouterOutputs<AppRouter>
+
 let browserQueryClient: QueryClient;
 function getQueryClient() {
   if (typeof window === 'undefined') {
@@ -21,14 +28,15 @@ function getQueryClient() {
   if (!browserQueryClient) browserQueryClient = makeQueryClient();
   return browserQueryClient;
 }
+
 function getUrl() {
   const base = (() => {
-    if (typeof window !== 'undefined') return '';
-    if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
-    return 'http://localhost:3000';
+    if (process.env.BACKEND_URL) return `${process.env.BACKEND_URL}`;
+    return 'http://localhost:4000';
   })();
   return `${base}/api/trpc`;
 }
+
 export function TRPCReactProvider(
   props: Readonly<{
     children: React.ReactNode;
@@ -43,17 +51,18 @@ export function TRPCReactProvider(
     createTRPCClient<AppRouter>({
       links: [
         httpBatchLink({
-          // transformer: superjson, <-- if you use a data transformer
+          transformer: superjson,
           url: getUrl(),
         }),
       ],
     }),
   );
+  
   return (
     <QueryClientProvider client={queryClient}>
-      <TRPCProvider trpcClient={trpcClient} queryClient={queryClient}>
-        {props.children}
+    <TRPCProvider trpcClient={ trpcClient } queryClient = { queryClient } >
+      { props.children }
       </TRPCProvider>
-    </QueryClientProvider>
+      </QueryClientProvider>
   );
 }

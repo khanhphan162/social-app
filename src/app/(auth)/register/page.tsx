@@ -1,8 +1,8 @@
-import { LoginForm } from "@/modules/auth/ui/components/login-form";
+import { RegisterForm } from "@/modules/auth/ui/components/register-form";
 
 const RegisterPage = () => {
     return (
-        <LoginForm/>
+        <RegisterForm />
     );
 }
  
