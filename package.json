@@ -3,10 +3,6 @@
   "version": "1.0.0",
   "description": "Social media application with Next.js frontend and Node.js backend",
   "private": true,
-  "workspaces": [
-    "client",
-    "server"
-  ],
   "scripts": {
     "dev": "concurrently \"pnpm dev:server\" \"pnpm dev:client\"",
     "dev:client": "cd client && pnpm dev",

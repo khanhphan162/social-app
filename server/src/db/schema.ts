@@ -93,8 +93,8 @@ export const commentsRelations = relations(comments, ({one}) => ({
     }),
 }));
 
-export const insertUserSchema = createInsertSchema(users, {
-    username: z.string().min(1,{
+export const insertUserSchema = createInsertSchema(users).extend({
+    username: z.string().min(1, {
         message: "Username is required.",
     }),
 });
