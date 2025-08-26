@@ -1,0 +1,37 @@
+{
+  "name": "social-app",
+  "version": "1.0.0",
+  "description": "Social media application with Next.js frontend and Node.js backend",
+  "private": true,
+  "workspaces": [
+    "client",
+    "server"
+  ],
+  "scripts": {
+    "dev": "concurrently \"pnpm dev:server\" \"pnpm dev:client\"",
+    "dev:client": "cd client && pnpm dev",
+    "dev:server": "cd server && pnpm dev",
+    "build": "pnpm build:server && pnpm build:client",
+    "build:client": "cd client && pnpm build",
+    "build:server": "cd server && pnpm build",
+    "start": "concurrently \"pnpm start:server\" \"pnpm start:client\"",
+    "start:client": "cd client && pnpm start",
+    "start:server": "cd server && pnpm start",
+    "lint": "cd client && pnpm lint",
+    "clean": "pnpm clean:client && pnpm clean:server",
+    "clean:client": "cd client && rmdir /s .next 2>nul || true",
+    "clean:server": "cd server && rmdir /s dist 2>nul || true",
+    "install:all": "pnpm install && cd client && pnpm install && cd ../server && pnpm install",
+    "db:generate": "cd server && pnpm db:generate",
+    "db:push": "cd server && pnpm db:push",
+    "db:migrate": "cd server && pnpm db:migrate",
+    "db:studio": "cd server && pnpm db:studio"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  }
+}
