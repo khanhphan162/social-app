@@ -12,7 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Edit, Save, X, Crown, Calendar } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
-import { PostCard } from "@/modules/home/ui/components/post/post-card";
+import { PostContent } from "@/modules/home/ui/components/post/post-content";
 
 export default function ProfilePage() {
     const params = useParams();
@@ -189,7 +189,7 @@ export default function ProfilePage() {
                     ) : userPosts && userPosts.posts.length > 0 ? (
                         <div className="space-y-4">
                             {userPosts.posts.map((post) => (
-                                <PostCard
+                                <PostContent
                                     key={post.id}
                                     post={{
                                         ...post,

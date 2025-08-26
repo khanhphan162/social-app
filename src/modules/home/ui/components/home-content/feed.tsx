@@ -5,14 +5,13 @@ import { useTRPC } from "@/trpc/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useSearch } from "@/modules/home/contexts/search-context";
 import CreatePost from "../post/create-post";
-import { PostCard } from "../post/post-card";
-import { CommentSection } from "../comment/comment-section";
+import { Post } from "../post";
 import { Button } from "@/components/ui/button";
 import { Loader2, SearchIcon } from "lucide-react";
-import { EditPostDialog } from "../post/edit-post-dialog";
-import { DeleteConfirmDialog } from "../post/delete-confirm-dialog";
+import { EditModal } from "@/components/modals/edit-modal";
+import { DeleteModal } from "@/components/modals/delete-modal";
 
-interface AuthenticatedContentProps {
+interface FeedProps {
     user: {
         id: string;
         name: string;
@@ -44,7 +43,7 @@ interface Post {
     } | null;
 }
 
-const AuthenticatedContent = ({ user }: AuthenticatedContentProps) => {
+const Feed = ({ user }: FeedProps) => {
     const [currentPage, setCurrentPage] = useState(1);
 
     const [editingPost, setEditingPost] = useState<Post | null>(null);
@@ -153,27 +152,18 @@ const AuthenticatedContent = ({ user }: AuthenticatedContentProps) => {
             ) : (
                 <div className="space-y-6">
                     {postsData?.posts.map((post) => (
-                        <div key={post.id} className="bg-white rounded-lg shadow-sm border hover:shadow-md transition-shadow">
-                            <PostCard
-                                key={post.id}
-                                post={{
-                                    ...post,
-                                    createdAt: new Date(post.createdAt),
-                                    updatedAt: new Date(post.updatedAt),
-                                }}
-                                currentUser={{
-                                    id: user.id,
-                                    role: user.role,
-                                }}
-                                onEdit={setEditingPost}
-                                onDelete={setDeletingPostId}
-                                onRestore={handleRestorePost}
-                            />
-                            <CommentSection
-                                postId={post.id}
-                                currentUser={user}
-                            />
-                        </div>
+                        <Post
+                            key={post.id}
+                            post={{
+                                ...post,
+                                createdAt: new Date(post.createdAt),
+                                updatedAt: new Date(post.updatedAt),
+                            }}
+                            currentUser={user}
+                            onEdit={setEditingPost}
+                            onDelete={setDeletingPostId}
+                            onRestore={handleRestorePost}
+                        />
                     ))}
                 </div>
             )}
@@ -205,24 +195,28 @@ const AuthenticatedContent = ({ user }: AuthenticatedContentProps) => {
                 </div>
             )}
 
-            {/* Edit Post Dialog */}
+            {/* Edit Post Modal */}
             {editingPost && (
-                <EditPostDialog
-                    post={editingPost}
+                <EditModal
+                    type="post"
+                    item={editingPost}
                     isOpen={!!editingPost}
                     onClose={() => setEditingPost(null)}
+                    onSuccess={refetchPosts}
                 />
             )}
 
-            {/* Delete Confirmation Dialog */}
-            <DeleteConfirmDialog
+            {/* Delete Confirmation Modal */}
+            <DeleteModal
                 isOpen={!!deletingPostId}
                 onClose={() => setDeletingPostId(null)}
                 onConfirm={handleDeletePost}
                 isLoading={deletePostMutation.isPending}
+                title="Delete Post"
+                description="Are you sure you want to delete this post? This action cannot be undone."
             />
         </div>
     );
 };
 
-export default AuthenticatedContent;
+export default Feed;

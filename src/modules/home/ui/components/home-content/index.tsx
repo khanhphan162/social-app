@@ -1,7 +1,7 @@
 "use client"
 
 import { useSession } from "@/hooks/use-session";
-import AuthenticatedContent from "./authenticated-content";
+import Feed from "./feed";
 
 const HomeContent = () => {
     const { user, isLoading } = useSession();
@@ -44,7 +44,7 @@ const HomeContent = () => {
     }
 
     return (
-        <AuthenticatedContent user={user} /> 
+        <Feed user={user} /> 
     );
 }
  

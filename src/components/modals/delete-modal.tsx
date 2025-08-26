@@ -11,7 +11,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Loader2, AlertTriangle } from "lucide-react";
 
-interface DeleteConfirmDialogProps {
+interface DeleteModalProps {
     isOpen: boolean;
     onClose: () => void;
     onConfirm: () => void;
@@ -20,14 +20,14 @@ interface DeleteConfirmDialogProps {
     description?: string;
 }
 
-export const DeleteConfirmDialog = ({
+export const DeleteModal = ({
     isOpen,
     onClose,
     onConfirm,
     isLoading = false,
     title = "Delete Item",
     description = "Are you sure you want to delete this item? This action cannot be undone."
-}: DeleteConfirmDialogProps) => {
+}: DeleteModalProps) => {
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent className="sm:max-w-[400px]">
