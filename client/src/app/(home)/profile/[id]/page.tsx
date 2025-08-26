@@ -46,7 +46,7 @@ export default function ProfilePage() {
                 queryClient.invalidateQueries({ queryKey: ['user', 'getMyProfile'] });
                 setIsEditing(false);
             },
-            onError: (error: unknown) => {
+            onError: (error) => {
                 console.error('Failed to update profile:', error);
             },
         })
