@@ -58,7 +58,7 @@ const AuthenticatedContent = ({ user }: AuthenticatedContentProps) => {
         setCurrentPage(1);
     }, [searchQuery]);
 
-    const { data: postsData, isLoading, error } = useQuery(
+    const { data: postsData, isLoading, error, refetch: refetchPosts } = useQuery(
         trpc.post.getPosts.queryOptions({
             page: currentPage,
             limit: 10,
@@ -69,7 +69,8 @@ const AuthenticatedContent = ({ user }: AuthenticatedContentProps) => {
     const deletePostMutation = useMutation(
         trpc.post.deletePost.mutationOptions({
             onSuccess: () => {
-                queryClient.invalidateQueries({ queryKey: ['post', 'getPosts'] });
+                // Use refetch instead of invalidateQueries for immediate update
+                refetchPosts();
                 setDeletingPostId(null);
             },
             onError: (error) => {
@@ -78,16 +79,11 @@ const AuthenticatedContent = ({ user }: AuthenticatedContentProps) => {
         })
     );
 
-    const handleDeletePost = () => {
-        if (deletingPostId) {
-            deletePostMutation.mutate({ id: deletingPostId });
-        }
-    };
-
     const restorePostMutation = useMutation(
         trpc.post.restorePost.mutationOptions({
             onSuccess: () => {
-                queryClient.invalidateQueries({ queryKey: ['post', 'getPosts'] });
+                // Use refetch instead of invalidateQueries for immediate update
+                refetchPosts();
                 if (searchQuery) {
                     queryClient.invalidateQueries({
                         queryKey: ['post', 'searchPosts', { query: searchQuery }]
@@ -99,6 +95,12 @@ const AuthenticatedContent = ({ user }: AuthenticatedContentProps) => {
             },
         })
     );
+
+    const handleDeletePost = () => {
+        if (deletingPostId) {
+            deletePostMutation.mutate({ id: deletingPostId });
+        }
+    };
 
     const handleRestorePost = (postId: string) => {
         restorePostMutation.mutate({ id: postId });

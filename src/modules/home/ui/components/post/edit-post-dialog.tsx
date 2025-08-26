@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useTRPC } from "@/trpc/client";
 import {
     Dialog,
@@ -33,12 +33,20 @@ interface EditPostDialogProps {
 export const EditPostDialog = ({ post, isOpen, onClose }: EditPostDialogProps) => {
     const [body, setBody] = useState(post?.body || "");
     const trpc = useTRPC();
-    const queryClient = useQueryClient();
+
+    // Get refetch function from getPosts query
+    const { refetch: refetchPosts } = useQuery(
+        trpc.post.getPosts.queryOptions({
+            page: 1,
+            limit: 10,
+        })
+    );
 
     const updatePostMutation = useMutation(
         trpc.post.updatePost.mutationOptions({
             onSuccess: () => {
-                queryClient.invalidateQueries({ queryKey: ["post", "getPosts"] });
+                // Use refetch instead of invalidateQueries for immediate update
+                refetchPosts();
                 onClose();
             },
             onError: (error) => {

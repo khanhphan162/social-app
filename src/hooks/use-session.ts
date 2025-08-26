@@ -147,6 +147,9 @@ export const useSession = () => {
     // Reset state
     setSessionToken(null);
     setIsInitialized(true);
+    
+    // Refresh the page to ensure complete state reset
+    window.location.href = '/';
   }, [queryClient]);
 
   // Refresh session function with useCallback

@@ -29,26 +29,34 @@ interface EditCommentDialogProps {
     comment: Comment | null;
     isOpen: boolean;
     onClose: () => void;
+    onSuccess?: () => void;
 }
 
-export const EditCommentDialog = ({ comment, isOpen, onClose }: EditCommentDialogProps) => {
+export const EditCommentDialog = ({ comment, isOpen, onClose, onSuccess }: EditCommentDialogProps) => {
     const [body, setBody] = useState(comment?.body || "");
     const trpc = useTRPC();
     const queryClient = useQueryClient();
 
+    // Remove the local useQuery since we'll use the onSuccess prop
+    // const { refetch: refetchComments } = useQuery(...)
+
     const updateCommentMutation = useMutation(
         trpc.comment.updateComment.mutationOptions({
             onSuccess: () => {
-                // Invalidate comments for this specific post
-                if (comment?.postId) {
-                    queryClient.invalidateQueries({ 
-                        queryKey: ['comment', 'getComments', { postId: comment.postId }] 
+                // Use the onSuccess prop if provided, otherwise fallback to local refetch
+                if (onSuccess) {
+                    onSuccess();
+                } else {
+                    // Fallback: refetch queries directly
+                    queryClient.refetchQueries({ 
+                        queryKey: ['comment', 'getComments', { postId: comment?.postId }],
+                        type: 'active'
+                    });
+                    queryClient.refetchQueries({ 
+                        queryKey: ['post', 'getPosts'],
+                        type: 'active'
                     });
                 }
-                // Also invalidate the posts query to update any comment counts
-                queryClient.invalidateQueries({ 
-                    queryKey: ['post', 'getPosts'] 
-                });
                 onClose();
             },
             onError: (error) => {

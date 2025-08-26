@@ -26,27 +26,27 @@ interface CommentSectionProps {
 
 // Add proper type definitions
 interface Comment {
-  id: string;
-  body: string;
-  createdAt: Date;
-  updatedAt: Date;
-  user: {
     id: string;
-    name: string;
-    username: string;
-    imageUrl?: string | null;
-  };
-  postId: string;
-  userId: string;
-  editedBy: string | null;
-  isEditedByAdmin: boolean | null;
-  isDeleted: boolean | null;
-  editor?: {
-    id: string;
-    name: string;
-    username: string;
-    imageUrl?: string | null;
-  } | null;
+    body: string;
+    createdAt: Date;
+    updatedAt: Date;
+    user: {
+        id: string;
+        name: string;
+        username: string;
+        imageUrl?: string | null;
+    };
+    postId: string;
+    userId: string;
+    editedBy: string | null;
+    isEditedByAdmin: boolean | null;
+    isDeleted: boolean | null;
+    editor?: {
+        id: string;
+        name: string;
+        username: string;
+        imageUrl?: string | null;
+    } | null;
 }
 
 export const CommentSection = ({ postId, currentUser }: CommentSectionProps) => {
@@ -58,7 +58,7 @@ export const CommentSection = ({ postId, currentUser }: CommentSectionProps) => 
     const [allLoadedComments, setAllLoadedComments] = useState<Comment[]>([]);
     const [hasLoadedPrevious, setHasLoadedPrevious] = useState(false);
     const [isCollapsed, setIsCollapsed] = useState(true);
-    
+
     const trpc = useTRPC();
     const queryClient = useQueryClient();
 
@@ -109,7 +109,7 @@ export const CommentSection = ({ postId, currentUser }: CommentSectionProps) => 
                 // Refetch comments instead of invalidation
                 refetchComments();
                 // Also refetch posts to update comment counts
-                queryClient.refetchQueries({ 
+                queryClient.refetchQueries({
                     queryKey: ['post', 'getPosts'],
                     type: 'active'
                 });
@@ -142,6 +142,10 @@ export const CommentSection = ({ postId, currentUser }: CommentSectionProps) => 
     const confirmDeleteComment = () => {
         if (deletingCommentId) {
             deleteCommentMutation.mutate({ id: deletingCommentId });
+            queryClient.refetchQueries({
+                queryKey: ['post', 'getPosts'],
+                type: 'active'
+            });
         }
     };
 
@@ -164,15 +168,15 @@ export const CommentSection = ({ postId, currentUser }: CommentSectionProps) => 
     };
 
     // Determine which comments to show
-    const commentsToShow = showAllComments 
+    const commentsToShow = showAllComments
         ? allLoadedComments
         : allLoadedComments.slice(0, 3);
-    
+
     const hasMoreToShow = !showAllComments && allLoadedComments.length > 3;
     const canLoadPrevious = currentPage > 1 && !hasLoadedPrevious;
 
     return (
-        <div className="space-y-4">
+        <div className="space-y-4 px-4 md:px-6">
             {/* Comments Header with Collapse Toggle */}
             <div className="flex items-center justify-between py-2 border-b border-gray-200">
                 <div className="flex items-center space-x-2">
@@ -199,11 +203,11 @@ export const CommentSection = ({ postId, currentUser }: CommentSectionProps) => 
             {!isCollapsed && (
                 <>
                     {/* Create Comment */}
-                    <div className="flex space-x-3">
+                    <div className="flex space-x-3 p-4 bg-white rounded-lg border border-gray-200 mx-2">
                         <Avatar className="h-8 w-8 flex-shrink-0">
                             <AvatarFallback className="text-xs">{getInitials(currentUser.name)}</AvatarFallback>
                         </Avatar>
-                        <div className="flex-1 space-y-2">
+                        <div className="flex-1 space-y-3">
                             <Textarea
                                 placeholder="Write a comment..."
                                 value={newComment}
@@ -217,21 +221,21 @@ export const CommentSection = ({ postId, currentUser }: CommentSectionProps) => 
                                     {300 - newComment.length} characters remaining
                                 </p>
                             )}
-                            <div className="flex justify-end">
+                            <div className="flex justify-end pt-2">
                                 <Button
                                     size="sm"
                                     onClick={handleSubmitComment}
                                     disabled={!newComment.trim() || createCommentMutation.isPending}
-                                    className="bg-blue-500 hover:bg-blue-600"
+                                    className="bg-blue-500 hover:bg-blue-600 px-6 py-2"
                                 >
                                     {createCommentMutation.isPending ? (
                                         <>
-                                            <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                                            <Loader2 className="h-3 w-3 mr-2 animate-spin" />
                                             Posting...
                                         </>
                                     ) : (
                                         <>
-                                            <Send className="h-3 w-3 mr-1" />
+                                            <Send className="h-3 w-3 mr-2" />
                                             Comment
                                         </>
                                     )}
@@ -245,10 +249,13 @@ export const CommentSection = ({ postId, currentUser }: CommentSectionProps) => 
                         <div className="flex justify-center py-4">
                             <Loader2 className="h-6 w-6 animate-spin text-blue-500" />
                         </div>
-                    ) : commentsData?.comments.length === 0 ? (
-                        <p className="text-gray-500 text-center py-4">No comments yet. Be the first to comment!</p>
+                    ) : commentsToShow.length === 0 ? (
+                        <div className="text-center py-8 text-gray-500">
+                            <MessageCircle className="h-12 w-12 mx-auto mb-2 text-gray-300" />
+                            <p>No comments yet. Be the first to comment!</p>
+                        </div>
                     ) : (
-                        <div className="space-y-3">
+                        <div className="space-y-3 px-2">
                             {/* Load Previous Comments Button */}
                             {canLoadPrevious && (
                                 <div className="flex justify-center">
@@ -275,22 +282,38 @@ export const CommentSection = ({ postId, currentUser }: CommentSectionProps) => 
                                 const canEdit = currentUser.id === comment.user.id || currentUser.role === 'admin';
                                 const canDelete = currentUser.id === comment.user.id || currentUser.role === 'admin';
                                 const isEdited = comment.createdAt.getTime() !== comment.updatedAt.getTime();
+                                const isDeleted = comment.isDeleted;
+                                const isAdmin = currentUser.role === 'admin';
+
+                                // Skip deleted comments for non-admin users
+                                if (isDeleted && !isAdmin) {
+                                    return null;
+                                }
 
                                 return (
-                                    <Card key={comment.id} className="bg-gray-50">
-                                        <CardContent className="p-3">
+                                    <Card key={comment.id} className={`mb-2 ${isDeleted ? 'bg-red-50 border-red-200' : 'bg-gray-50'}`}>
+                                        <CardContent className="p-4 mx-2">
                                             <div className="flex space-x-3">
                                                 <Avatar className="h-8 w-8 flex-shrink-0">
                                                     <AvatarFallback className="text-xs">{getInitials(comment.user.name)}</AvatarFallback>
                                                 </Avatar>
                                                 <div className="flex-1 min-w-0">
-                                                    <div className="flex items-center justify-between">
+                                                    <div className="flex items-center justify-between mb-2">
                                                         <div className="flex items-center space-x-2">
                                                             <span className="font-medium text-sm">{comment.user.name}</span>
                                                             <span className="text-xs text-gray-500">@{comment.user.username}</span>
                                                             <span className="text-xs text-gray-500">
                                                                 {formatDistanceToNow(comment.createdAt, { addSuffix: true })}
                                                             </span>
+                                                            {isDeleted && (
+                                                                <>
+                                                                    <span className="text-xs text-gray-500">•</span>
+                                                                    <span className="text-xs text-red-600 font-medium flex items-center">
+                                                                        <Trash2 className="h-2 w-2 mr-1" />
+                                                                        DELETED
+                                                                    </span>
+                                                                </>
+                                                            )}
                                                             {isEdited && (
                                                                 <>
                                                                     <span className="text-xs text-gray-500">•</span>
@@ -304,7 +327,7 @@ export const CommentSection = ({ postId, currentUser }: CommentSectionProps) => 
                                                                 </>
                                                             )}
                                                         </div>
-                                                        {(canEdit || canDelete) && (
+                                                        {(canEdit || canDelete) && !isDeleted && (
                                                             <DropdownMenu>
                                                                 <DropdownMenuTrigger asChild>
                                                                     <Button variant="ghost" size="sm" className="h-6 w-6 p-0">
@@ -319,7 +342,7 @@ export const CommentSection = ({ postId, currentUser }: CommentSectionProps) => 
                                                                         </DropdownMenuItem>
                                                                     )}
                                                                     {canDelete && (
-                                                                        <DropdownMenuItem 
+                                                                        <DropdownMenuItem
                                                                             onClick={() => handleDeleteComment(comment.id)}
                                                                             className="text-red-600 focus:text-red-600"
                                                                         >
@@ -331,13 +354,20 @@ export const CommentSection = ({ postId, currentUser }: CommentSectionProps) => 
                                                             </DropdownMenu>
                                                         )}
                                                     </div>
-                                                    <p className="text-sm text-gray-900 mt-1 whitespace-pre-wrap break-all overflow-wrap-anywhere">
-                                                        {comment.body}
+                                                    <p className={`text-sm mt-2 whitespace-pre-wrap break-all overflow-wrap-anywhere ${isDeleted ? 'text-gray-500 italic line-through' : 'text-gray-900'
+                                                        }`}>
+                                                        {isDeleted ? '[This comment has been deleted]' : comment.body}
                                                     </p>
                                                     {comment.isEditedByAdmin && comment.editor && (
-                                                        <div className="flex items-center space-x-1 mt-2 p-1 bg-blue-100 rounded text-xs text-blue-800">
+                                                        <div className="flex items-center space-x-1 mt-3 p-2 bg-blue-100 rounded text-xs text-blue-800">
                                                             <Shield className="h-3 w-3" />
                                                             <span>Edited by admin (@{comment.editor.username})</span>
+                                                        </div>
+                                                    )}
+                                                    {isDeleted && isAdmin && (
+                                                        <div className="flex items-center space-x-1 mt-3 p-2 bg-red-100 rounded text-xs text-red-800">
+                                                            <Trash2 className="h-3 w-3" />
+                                                            <span>This comment has been deleted</span>
                                                         </div>
                                                     )}
                                                 </div>
@@ -349,12 +379,12 @@ export const CommentSection = ({ postId, currentUser }: CommentSectionProps) => 
 
                             {/* Show More Comments Button */}
                             {hasMoreToShow && (
-                                <div className="flex justify-center">
+                                <div className="flex justify-center py-3">
                                     <Button
                                         variant="ghost"
                                         size="sm"
                                         onClick={() => setShowAllComments(true)}
-                                        className="text-blue-600 hover:text-blue-800"
+                                        className="text-blue-600 hover:text-blue-800 px-4 py-2"
                                     >
                                         Show {allLoadedComments.length - 3} more comments
                                     </Button>
@@ -363,16 +393,17 @@ export const CommentSection = ({ postId, currentUser }: CommentSectionProps) => 
 
                             {/* Load More Comments (for pagination) */}
                             {showAllComments && commentsData?.hasMore && (
-                                <div className="flex justify-center">
+                                <div className="flex justify-center py-3">
                                     <Button
                                         variant="ghost"
                                         size="sm"
                                         onClick={loadMoreComments}
                                         disabled={isLoading}
+                                        className="px-4 py-2"
                                     >
                                         {isLoading ? (
                                             <>
-                                                <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                                                <Loader2 className="h-3 w-3 mr-2 animate-spin" />
                                                 Loading...
                                             </>
                                         ) : (
@@ -392,6 +423,15 @@ export const CommentSection = ({ postId, currentUser }: CommentSectionProps) => 
                     comment={editingComment}
                     isOpen={!!editingComment}
                     onClose={() => setEditingComment(null)}
+                    onSuccess={() => {
+                        // Refetch comments after successful edit
+                        refetchComments();
+                        // Also refetch posts to update comment counts
+                        queryClient.refetchQueries({
+                            queryKey: ['post', 'getPosts'],
+                            type: 'active'
+                        });
+                    }}
                 />
             )}
 

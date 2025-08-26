@@ -2,7 +2,6 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
 import { useState } from "react"
 
 import { SearchInput } from "./search-input"
@@ -36,7 +35,6 @@ interface HomeNavbarProps {
 export const HomeNavbar = ({
     user
 }: HomeNavbarProps) => {
-    const router = useRouter();
     const trpc = useTRPC();
     const [isLoggingOut, setIsLoggingOut] = useState(false);
 
@@ -44,14 +42,17 @@ export const HomeNavbar = ({
         onSuccess: () => {
             // Clear the session cookie
             document.cookie = 'sessionToken=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-
-            router.push('/');
+    
+            // Refresh the page to reset all state
+            window.location.href = '/';
         },
         onError: (error) => {
             console.error('Logout failed:', error);
             // Even if logout fails on server, clear local session
             document.cookie = 'sessionToken=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-            router.push('/');
+            
+            // Refresh the page to reset all state
+            window.location.href = '/';
         },
         onSettled: () => {
             setIsLoggingOut(false);
