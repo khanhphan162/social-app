@@ -50,7 +50,7 @@ A modern full-stack social media application built with Next.js, Fastify, tRPC, 
 ### 1. Clone the repository
 
 ```bash
-gh repo clone khanhphan162/social-app
+git clone https://github.com/khanhphan162/social-app.git
 cd social-app
 ```
 
