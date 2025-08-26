@@ -1,18 +1,18 @@
 "use client";
 
 import { useParams } from "next/navigation";
-import { useSession } from "../../../../hooks/use-session";
-import { useTRPC } from "../../../../trpc/client";
+import { useSession } from "@/hooks/use-session";
+import { useTRPC } from "@/trpc/client";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "../../../../components/ui/card";
-import { Avatar, AvatarFallback } from "../../../../components/ui/avatar";
-import { Button } from "../../../../components/ui/button";
-import { Input } from "../../../../components/ui/input";
-import { Badge } from "../../../../components/ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import { Loader2, Edit, Save, X, Crown, Calendar } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
-import { PostContent } from "../../../../modules/home/ui/components/post/post-content";
+import { PostContent } from "@/modules/home/ui/components/post/post-content";
 
 export default function ProfilePage() {
     const params = useParams();
@@ -46,7 +46,7 @@ export default function ProfilePage() {
                 queryClient.invalidateQueries({ queryKey: ['user', 'getMyProfile'] });
                 setIsEditing(false);
             },
-            onError: (error) => {
+            onError: (error: unknown) => {
                 console.error('Failed to update profile:', error);
             },
         })
