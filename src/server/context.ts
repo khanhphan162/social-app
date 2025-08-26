@@ -1,13 +1,8 @@
-import { CreateFastifyContextOptions } from "@trpc/server/adapters/fastify";
 import { FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch";
 import * as schema from "@/db/schema";
-import dotenv from "dotenv";
 import { drizzle } from "drizzle-orm/neon-http";
 import { eq, and, gt } from "drizzle-orm";
 import { sessions } from "@/db/schema";
-import { FastifyRequest } from 'fastify';
-
-dotenv.config({path: ".env.local"});
 
 const databaseUrl = process.env.DATABASE_URL;
 
@@ -16,7 +11,7 @@ if (!databaseUrl) throw new Error("DATABASE_URL is not defined");
 const config = { databaseUrl };
 export const db = drizzle(databaseUrl, { schema });
 
-// Helper function for Fetch API requests
+// Helper function for Fetch API requests (serverless)
 const getFetchHeaders = (req: Request) => {
   const getHeaderValue = (value: string | null): string | null => {
     return value || null;
@@ -26,28 +21,6 @@ const getFetchHeaders = (req: Request) => {
     authorization: getHeaderValue(req.headers.get('authorization')),
     cookie: getHeaderValue(req.headers.get('cookie'))
   };
-};
-
-// Helper function to safely get headers from Fastify requests
-const getHeaders = (req: FastifyRequest) => {
-  console.log('🔍 Request object type:', typeof req, 'keys:', Object.keys(req));
-  
-  // For Fastify requests
-  if (req.headers && typeof req.headers === 'object') {
-    console.log('📋 Using Fastify headers object access');
-    const headers = req.headers as Record<string, string | string[] | undefined>;
-    const getHeaderValue = (value: string | string[] | undefined): string | null => {
-      if (Array.isArray(value)) return value[0] || null;
-      return value || null;
-    };
-    return {
-      authorization: getHeaderValue(headers.authorization || headers['Authorization']),
-      cookie: getHeaderValue(headers.cookie || headers['Cookie'])
-    };
-  }
-  
-  console.log('❌ Cannot extract headers from request object');
-  return { authorization: null, cookie: null };
 };
 
 // Enhanced session verification with detailed logging
@@ -196,72 +169,7 @@ export const createFetchContext = async (opts: FetchCreateContextFnOptions) => {
   }
 };
 
-// Main context creation function for Fastify
-const createTRPCContext = async ({ req, res }: CreateFastifyContextOptions) => {
-  console.log('🚀 Creating tRPC context...');
-  
-  try {
-    const headers = getHeaders(req);
-    
-    console.log('🔍 Headers extracted:', {
-      hasAuthHeader: !!headers.authorization,
-      hasCookieHeader: !!headers.cookie,
-      cookiePreview: headers.cookie ? headers.cookie.substring(0, 100) + '...' : 'none'
-    });
-    
-    let token: string | null = null;
-    
-    // Try Authorization header first (Bearer token)
-    if (headers.authorization?.startsWith('Bearer ')) {
-      token = headers.authorization.slice(7);
-      console.log('📋 Token from Authorization header');
-    } 
-    // Then try cookie
-    else if (headers.cookie) {
-      const cookies = headers.cookie.split(';').map((cookie: string) => cookie.trim());
-      const sessionCookie = cookies.find((cookie: string) => cookie.startsWith('sessionToken='));
-      
-      console.log('🍪 Available cookies:', cookies.map((c: string) => c.split('=')[0]));
-      
-      if (sessionCookie) {
-        token = decodeURIComponent(sessionCookie.split('=')[1]);
-        console.log('🍪 Token from cookie found, length:', token.length);
-      } else {
-        console.log('🍪 No sessionToken cookie found');
-      }
-    }
-
-    if (!token) {
-      console.log('❌ No authentication token found in request');
-      return { req, res, db, config, user: null, session: null };
-    }
-
-    console.log('🔑 Attempting to verify token...');
-    const authData = await verifySessionToken(token);
-    
-    if (authData) {
-      console.log('✅ Authentication successful for user:', authData.user.username);
-      return { 
-        req, 
-        res,
-        user: authData.user, 
-        session: authData.session,
-        db, 
-        config 
-      };
-    } else {
-      console.log('❌ Authentication failed - invalid session');
-      return { req, res, db, config, user: null, session: null };
-    }
-  } catch (error: unknown) {
-    console.error("❌ Context creation error:", error);
-    if (error instanceof Error) {
-      console.error("❌ Error stack:", error.stack);
-    }
-    return { req, res, db, config, user: null, session: null };
-  }
-};
-
-export type Context = Awaited<ReturnType<typeof createTRPCContext>>;
-export type FetchContext = Awaited<ReturnType<typeof createFetchContext>>;
-export default createTRPCContext;
+// Export the context type and function
+export type Context = Awaited<ReturnType<typeof createFetchContext>>;
+export const createContext = createFetchContext;
+export default createFetchContext;

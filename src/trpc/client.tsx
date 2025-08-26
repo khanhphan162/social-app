@@ -30,9 +30,14 @@ function getQueryClient() {
 }
 
 function getUrl() {
+  if (typeof window !== 'undefined') {
+    return `${window.location.origin}/api/trpc`;
+  }
+  
+  // Server-side: use environment variable or localhost
   const base = (() => {
-    if (process.env.BACKEND_URL) return `${process.env.BACKEND_URL}`;
-    return 'http://localhost:4000';
+    if (process.env.VERCEL_PROJECT_PRODUCTION_URL) return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
+    return 'http://localhost:3000';
   })();
   return `${base}/api/trpc`;
 }

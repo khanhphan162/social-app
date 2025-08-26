@@ -65,10 +65,10 @@ pnpm install
 Copy the environment template:
 
 ```bash
-cp .env.sample .env.local
+cp .env.sample .env
 ```
 
-Fill in your environment variables in `.env.local` (see Environment Variables section below).
+Fill in your environment variables in `.env` (see Environment Variables section below).
 
 ### 4. Database Setup
 
@@ -97,7 +97,7 @@ The application will be available at:
 
 ## 🔧 Environment Variables
 
-Create a `.env.local` file in the root directory with the following variables:
+Create a `.env` file in the root directory with the following variables:
 
 ```env
 # Database

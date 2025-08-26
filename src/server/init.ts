@@ -1,11 +1,12 @@
 import { initTRPC, TRPCError } from "@trpc/server";
-import { Context, FetchContext } from "./context";
+import { createFetchContext } from "./context";
 import superjson from "superjson";
 
-type UniversalContext = Context | FetchContext;
+// Get the context type from createFetchContext
+type Context = Awaited<ReturnType<typeof createFetchContext>>;
 
-// Initialize tRPC with union context type
-const t = initTRPC.context<UniversalContext>().create({
+// Initialize tRPC with the serverless context type
+const t = initTRPC.context<Context>().create({
   transformer: superjson,
   errorFormatter({ shape, error }) {
     return {

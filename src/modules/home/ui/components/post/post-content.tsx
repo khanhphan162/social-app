@@ -11,7 +11,6 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal, Edit, Trash2, Shield, RotateCcw, Crown } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
-import { EditModal } from "@/components/modals/edit-modal";
 
 interface Post {
     id: string;
