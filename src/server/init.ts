@@ -1,9 +1,11 @@
 import { initTRPC, TRPCError } from "@trpc/server";
-import { Context } from "./context";
+import { Context, FetchContext } from "./context";
 import superjson from "superjson";
 
-// Initialize tRPC with context type
-const t = initTRPC.context<Context>().create({
+type UniversalContext = Context | FetchContext;
+
+// Initialize tRPC with union context type
+const t = initTRPC.context<UniversalContext>().create({
   transformer: superjson,
   errorFormatter({ shape, error }) {
     return {
@@ -42,15 +44,13 @@ export const protectedProcedure = publicProcedure.use(async ({ ctx, next }) => {
 
   console.log('✅ Protected procedure: Authentication successful');
 
-  // Return context with guaranteed non-null user and session
   return next({
     ctx: {
       ...ctx,
-      user: ctx.user, // TypeScript now knows this is non-null
-      session: ctx.session, // TypeScript now knows this is non-null
+      user: ctx.user,
+      session: ctx.session,
     },
   });
 });
 
-// Export the tRPC instance for advanced usage
 export { t };

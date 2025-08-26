@@ -3,38 +3,36 @@
 import { useSession } from '@/hooks/use-session';
 import React, { createContext, useContext, ReactNode } from 'react';
 import { TRPCClientErrorLike } from '@trpc/client';
+import { AppRouter } from '@/server/router';
 
-interface User {
+interface SessionContextType {
+  user: {
     id: string;
     name: string;
     username: string;
     imageUrl: string | null;
+    createdAt: Date;
     role: string;
-}
-
-interface Session {
+  } | null | undefined;
+  sessions: {
     id: string;
     ipAddress: string | null;
     userAgent: string | null;
     createdAt: Date;
     expiresAt: Date;
-}
-
-interface SessionContextType {
-    user: User | null | undefined;
-    sessions: Session[] | undefined;
-    sessionToken: string | null;
-    isLoading: boolean;
-    isAuthenticated: boolean;
-    error: TRPCClientErrorLike<any> | null;
-    logout: () => void;
-    logoutAll: () => void;
-    refreshSession: () => void;
-    refetchUser: () => void;
-    refetchSessions: () => void;
-    isRefreshing: boolean;
-    isLoggingOut: boolean;
-    isInitialized: boolean;
+  }[] | undefined;
+  error: TRPCClientErrorLike<AppRouter> | null;
+  sessionToken: string | null;
+  isLoading: boolean;
+  isAuthenticated: boolean;
+  logout: () => void;
+  logoutAll: () => void;
+  refreshSession: () => void;
+  refetchUser: () => void;
+  refetchSessions: () => void;
+  isRefreshing: boolean;
+  isLoggingOut: boolean;
+  isInitialized: boolean;
 }
 
 const SessionContext = createContext<SessionContextType | undefined>(undefined);
