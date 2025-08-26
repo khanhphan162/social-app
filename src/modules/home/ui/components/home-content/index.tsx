@@ -43,13 +43,8 @@ const HomeContent = () => {
         );
     }
 
-    const userForAuth = {
-        ...user,
-        imageUrl: user.imageUrl ?? undefined
-    };
-
     return (
-        <AuthenticatedContent user={userForAuth} />
+        <AuthenticatedContent user={user} /> 
     );
 }
  

@@ -47,11 +47,12 @@ const commentRouter = createTRPCRouter({
             },
           },
           editor: {
-            columns: {
-              id: true,
-              name: true,
-              username: true,
-            },
+              columns: {
+                  id: true,
+                  name: true,
+                  username: true,
+                  imageUrl: true,
+              },
           },
         },
       });
@@ -94,6 +95,7 @@ const commentRouter = createTRPCRouter({
               id: true,
               name: true,
               username: true,
+              imageUrl: true,
             },
           },
         },

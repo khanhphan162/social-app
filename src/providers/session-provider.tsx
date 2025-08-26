@@ -2,28 +2,31 @@
 
 import { useSession } from '@/hooks/use-session';
 import React, { createContext, useContext, ReactNode } from 'react';
+import { TRPCClientErrorLike } from '@trpc/client';
 
 interface User {
     id: string;
     name: string;
     username: string;
-    imageUrl?: string;
+    imageUrl: string | null;
     role: string;
 }
 
 interface Session {
     id: string;
-    token: string;
+    ipAddress: string | null;
+    userAgent: string | null;
+    createdAt: Date;
     expiresAt: Date;
 }
 
 interface SessionContextType {
-    user: User | null;
+    user: User | null | undefined;
     sessions: Session[] | undefined;
     sessionToken: string | null;
     isLoading: boolean;
     isAuthenticated: boolean;
-    error: Error | null;
+    error: TRPCClientErrorLike<any> | null;
     logout: () => void;
     logoutAll: () => void;
     refreshSession: () => void;

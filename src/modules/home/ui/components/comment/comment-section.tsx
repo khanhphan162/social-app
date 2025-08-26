@@ -19,7 +19,7 @@ interface CommentSectionProps {
         id: string;
         name: string;
         username: string;
-        imageUrl?: string;
+        imageUrl: string | null;
         role: string;
     };
 }
@@ -34,7 +34,7 @@ interface Comment {
         id: string;
         name: string;
         username: string;
-        imageUrl?: string | null;
+        imageUrl: string | null;  // Already correct
     };
     postId: string;
     userId: string;
@@ -45,7 +45,7 @@ interface Comment {
         id: string;
         name: string;
         username: string;
-        imageUrl?: string | null;
+        imageUrl: string | null;
     } | null;
 }
 

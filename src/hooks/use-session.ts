@@ -68,8 +68,8 @@ export const useSession = () => {
       
       // Don't retry if it's an authentication error
       if ((error as Error)?.message?.includes('UNAUTHORIZED') || 
-          error?.message?.includes('unauthorized') || 
-          error?.message?.includes('authentication')) {
+          (error as Error)?.message?.includes('unauthorized') || 
+          (error as Error)?.message?.includes('authentication')) {
         console.log('❌ Authentication error - not retrying');
         return false;
       }

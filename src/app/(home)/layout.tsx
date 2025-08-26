@@ -12,10 +12,6 @@ const HomeLayout = ({ children }: HomeLayoutProps) => {
     const { 
         user, 
         isLoading,
-        logout,
-        logoutAll,
-        sessions,
-        isRefreshing 
     } = useSessionContext();
     
     if (isLoading) {
@@ -30,11 +26,7 @@ const HomeLayout = ({ children }: HomeLayoutProps) => {
             <div className="w-full">
                 {user ? (
                     <HomeNavbar 
-                        user={user} 
-                        onLogout={logout}
-                        onLogoutAll={logoutAll}
-                        sessions={sessions}
-                        isRefreshing={isRefreshing}
+                        user={user}
                     />
                 ) : (
                     <HomeNavbar />

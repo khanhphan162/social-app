@@ -40,11 +40,12 @@ const postRouter = createTRPCRouter({
             },
           },
           editor: {
-            columns: {
-              id: true,
-              name: true,
-              username: true,
-            },
+              columns: {
+                  id: true,
+                  name: true,
+                  username: true,
+                  imageUrl: true,  // Add this line
+              },
           },
         },
       });
@@ -86,7 +87,7 @@ const postRouter = createTRPCRouter({
               name: true,
               username: true,
               imageUrl: true,
-              role: true, // Include role for admin badge
+              role: true,
             },
           },
           editor: {
@@ -94,6 +95,7 @@ const postRouter = createTRPCRouter({
               id: true,
               name: true,
               username: true,
+              imageUrl: true,
             },
           },
         },

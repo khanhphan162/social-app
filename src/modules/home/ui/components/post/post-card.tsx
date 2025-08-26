@@ -17,14 +17,14 @@ interface Post {
     body: string;
     createdAt: Date;
     updatedAt: Date;
-    isEditedByAdmin?: boolean;
-    isDeleted?: boolean;
+    isEditedByAdmin: boolean | null;
+    isDeleted: boolean | null;
     editedBy: string | null;
     user: {
         id: string;
         name: string;
         username: string;
-        imageUrl?: string;
+        imageUrl: string | null;
         role?: string;
     };
     editor?: {
