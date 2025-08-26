@@ -1,0 +1,51 @@
+"use client"
+
+import { useSession } from "@/hooks/use-session";
+import Feed from "./feed";
+
+const HomeContent = () => {
+    const { user, isLoading } = useSession();
+
+    if (isLoading) {
+        return (
+            <div className="flex items-center justify-center min-h-screen">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+            </div>
+        );
+    }
+
+    if (!user) {
+        return (
+            <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                <div className="text-center">
+                    <h1 className="text-4xl font-bold text-gray-900 mb-4">
+                        Welcome to SocialApp
+                    </h1>
+                    <p className="text-xl text-gray-600 mb-8">
+                        Connect with friends and share your thoughts
+                    </p>
+                    <div className="space-x-4">
+                        <a 
+                            href="/register"
+                            className="bg-blue-500 text-white px-6 py-3 rounded-md hover:bg-blue-600 inline-block"
+                        >
+                            Get Started
+                        </a>
+                        <a 
+                            href="/login"
+                            className="bg-gray-200 text-gray-900 px-6 py-3 rounded-md hover:bg-gray-300 inline-block"
+                        >
+                            Sign In
+                        </a>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <Feed user={user} /> 
+    );
+}
+ 
+export default HomeContent;

@@ -1,222 +1,208 @@
 # Social Media Application
 
-A modern full-stack social media application built with Next.js, Fastify, tRPC, and PostgreSQL.
+A modern full-stack social media application built with Next.js, Fastify, tRPC, and PostgreSQL. This is a monorepo containing both the frontend client and backend server applications.
+
+## 🏗️ Project Structure
+```
+social-app/
+├── client/          # Next.js frontend application
+│   ├── src/
+│   │   ├── app/     # Next.js App Router pages
+│   │   ├── components/  # Reusable UI components
+│   │   ├── modules/ # Feature-specific modules (auth, posts, etc.)
+│   │   ├── trpc/    # tRPC client configuration
+│   │   └── ...
+│   ├── package.json
+│   └── README.md
+└── server/          # Fastify backend application
+│   ├── src/
+│   │   ├── api/     # API route handlers
+│   │   ├── db/      # Database schema and configuration
+│   │   ├── router/  # tRPC router definitions
+│   │   ├── handlers/ # Authentication and other handlers
+│   │   └── ...
+│   ├── package.json
+│   └── drizzle.config.ts
+└── README.md
+```
 
 ## 🚀 Features
 
-- **User Authentication**: Secure authentication with Better Auth
+- **User Authentication**: Secure authentication
 - **Post Management**: Create, edit, delete, and view posts
-- **Comment System**: Interactive commenting with real-time updates
+- **Comment System**: Interactive commenting system
 - **Search Functionality**: Search posts by content and username
 - **Admin Features**: Content moderation and user management
 - **Profile Management**: User profile customization
 - **Responsive Design**: Mobile-first design with Tailwind CSS
-- **Real-time Updates**: Live updates using tRPC subscriptions
+- **Type Safety**: End-to-end type safety with TypeScript and tRPC
 
 ## 🛠️ Tech Stack
 
-### Frontend
+### Frontend (Client)
 - **Next.js 15** - React framework with App Router
 - **React 19** - UI library
 - **TypeScript** - Type safety
-- **Tailwind CSS** - Styling
-- **Shadcn/ui** - UI components
-- **Lucide React** - Icons
+- **Tailwind CSS** - Styling framework
+- **Shadcn/ui** - UI component library
+- **tRPC** - Type-safe API client
 - **TanStack Query** - Data fetching and caching
-- **tRPC** - End-to-end typesafe APIs
-
-### Backend
-- **Fastify** - Fast and efficient web framework
-- **tRPC** - Type-safe API layer
-- **Better Auth** - Authentication system
-- **Drizzle ORM** - Type-safe database toolkit
-- **PostgreSQL** - Database (via Neon)
+- **React Hook Form** - Form management
 - **Zod** - Schema validation
 
-### Development Tools
-- **ESLint** - Code linting
-- **TypeScript** - Static type checking
-- **Drizzle Kit** - Database migrations
-- **TSX** - TypeScript execution
+### Backend (Server)
+- **Fastify** - Fast and efficient web framework
+- **tRPC** - Type-safe API layer
+- **Drizzle ORM** - Type-safe database toolkit
+- **PostgreSQL** - Database (via Neon)
+- **TypeScript** - Type safety
+- **Zod** - Schema validation
+- **bcrypt** - Password hashing
 
 ## 📋 Prerequisites
 
-- Node.js 18+ 
+- Node.js 18+
 - pnpm (recommended) or npm
 - PostgreSQL database (Neon recommended)
 
-## 🚀 Getting Started
+## 🚀 Quick Start
 
 ### 1. Clone the repository
-
 ```bash
 git clone https://github.com/khanhphan162/social-app.git
 cd social-app
 ```
 
 ### 2. Install dependencies
-
 ```bash
+# Install dependencies for both client and server
 pnpm install
 ```
 
 ### 3. Environment Setup
 
-Copy the environment template:
-
-```bash
-cp .env.sample .env.local
+#### Server Environment
+Create `server/.env` file:
+```env
+DATABASE_URL=your_postgresql_connection_string
+PORT=4000
+FRONTEND_URL=http://localhost:3000
 ```
 
-Fill in your environment variables in `.env.local` (see Environment Variables section below).
+#### Client Environment
+Create `client/.env` file:
+```env
+BACKEND_URL=http://localhost:4000
+```
 
 ### 4. Database Setup
-
-Generate and push database schema:
-
 ```bash
+# Navigate to server directory
+cd server
+
+# Generate database schema
 pnpm db:generate
+
+# Push schema to database
 pnpm db:push
 ```
 
-### 5. Development
+### 5. Start Development Servers
 
-Start the development servers:
-
+#### Terminal 1 - Start Backend Server
 ```bash
-# Terminal 1 - Backend server
-pnpm dev:server
+cd server
+pnpm dev
+```
+Server will run on http://localhost:4000
 
-# Terminal 2 - Frontend server
-pnpm dev:client
+#### Terminal 2 - Start Frontend Client
+```bash
+cd client
+pnpm dev
+```
+Client will run on http://localhost:3000
+
+## 🔧 Available Scripts
+
+### Client Scripts
+```bash
+cd client
+pnpm dev          # Start development server
+pnpm build        # Build for production
+pnpm start        # Start production server
+pnpm lint         # Run ESLint
 ```
 
-The application will be available at:
-- Frontend: http://localhost:3000
-- Backend API: http://localhost:4000
-
-## 🔧 Environment Variables
-
-Create a `.env.local` file in the root directory with the following variables:
-
-```env
-# Database
-DATABASE_URL="postgresql://username:password@host:port/database"
-
-# Server Configuration
-PORT=4000
-FRONTEND_URL="http://localhost:3000"
-BACKEND_URL="http://localhost:4000"
-
+### Server Scripts
+```bash
+cd server
+pnpm dev          # Start development server with hot reload
+pnpm build        # Build TypeScript to JavaScript
+pnpm start        # Start production server
+pnpm db:generate  # Generate database migrations
+pnpm db:push      # Push schema changes to database
+pnpm db:migrate   # Run database migrations
+pnpm db:studio    # Open Drizzle Studio
 ```
 
-## 📜 Available Scripts
+## 🏗️ Architecture
 
-### Development
-- `pnpm dev:server` - Start backend development server
-- `pnpm dev:client` - Start frontend development server
+### Client Architecture
+- **App Router**: Next.js 13+ App Router for file-based routing
+- **Module-based Structure**: Features organized in modules (auth, posts, etc.)
+- **Component Library**: Reusable UI components with Shadcn/ui
+- **Type-safe API**: tRPC client for end-to-end type safety
 
-### Building
-- `pnpm build:server` - Build backend for production
-- `pnpm build:front` - Build frontend for production
+### Server Architecture
+- **Fastify Framework**: High-performance web framework
+- **tRPC Router**: Type-safe API endpoints
+- **Drizzle ORM**: Type-safe database operations
+- **Modular Structure**: Organized by feature domains
 
-### Production
-- `pnpm start:server` - Start production backend server
-- `pnpm start:client` - Start production frontend server
+### API Communication
+- **tRPC**: End-to-end type safety between client and server
+- **HTTP/JSON**: RESTful API patterns with tRPC
+- **Real-time**: WebSocket support for live updates
 
-### Database
-- `pnpm db:generate` - Generate database migrations
-- `pnpm db:push` - Push schema changes to database
-- `pnpm db:migrate` - Run database migrations
-- `pnpm db:studio` - Open Drizzle Studio (database GUI)
+## 🔒 Authentication
 
-### Code Quality
-- `pnpm lint` - Run ESLint
+The application uses Better Auth for authentication with the following features:
+- User registration and login
+- JWT token-based authentication
+- Role-based access control (admin/user)
+- Secure password hashing with bcrypt
 
-## 🏗️ Project Structure
-```
-src/
-├── app/                    # Next.js App Router
-│   ├── (auth)/            # Authentication pages
-│   ├── (home)/            # Main application pages
-│   └── layout.tsx         # Root layout
-├── components/            # Reusable UI components
-│   └── ui/               # Shadcn/ui components
-├── db/                   # Database configuration
-│   ├── index.ts          # Database connection
-│   └── schema.ts         # Database schema
-├── hooks/                # Custom React hooks
-├── lib/                  # Utility libraries
-├── modules/              # Feature modules
-│   ├── auth/            # Authentication module
-│   └── home/            # Home/feed module
-├── providers/           # React context providers
-├── server/              # Backend server code
-│   ├── api/            # API handlers
-│   ├── handlers/       # Route handlers
-│   ├── lib/           # Server utilities
-│   ├── router/        # tRPC routers
-│   └── index.ts       # Server entry point
-└── trpc/               # tRPC client configuration
-```
+## 🗄️ Database
 
-## 🔐 Authentication
-
-- Username-based authentication
-- Session management
-- Role-based access control (user/admin)
-- Secure password hashing
-
-## 🗄️ Database Schema
-
-The application uses PostgreSQL with the following main entities:
-- **Users**: User accounts and profiles
-- **Posts**: User posts/content
-- **Comments**: Post comments
-- **Sessions**: Authentication sessions
-
-## 🚀 Deployment
-
-### Backend Deployment
-1. Build the server: `pnpm build:server`
-2. Set production environment variables
-3. Run migrations: `pnpm db:migrate`
-4. Start the server: `pnpm start:server`
-
-### Frontend Deployment
-1. Build the frontend: `pnpm build:front`
-2. Deploy to your preferred platform (Vercel, Netlify, etc.)
-3. Update environment variables for production URLs
+- **PostgreSQL**: Primary database
+- **Drizzle ORM**: Type-safe database toolkit
+- **Neon**: Recommended PostgreSQL hosting
+- **Migrations**: Automated schema management
 
 ## 🤝 Contributing
 
 1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/amazing-feature`
-3. Commit your changes: `git commit -m 'Add amazing feature'`
-4. Push to the branch: `git push origin feature/amazing-feature`
-5. Open a Pull Request
+2. Create a feature branch: `git checkout -b feature/new-feature`
+3. Make your changes
+4. Run tests and linting
+5. Commit your changes: `git commit -m 'Add new feature'`
+6. Push to the branch: `git push origin feature/new-feature`
+7. Submit a pull request
 
 ## 📝 License
 
 This project is licensed under the MIT License.
 
-## 🐛 Troubleshooting
+## 🆘 Support
 
-### Common Issues
+If you encounter any issues or have questions:
+1. Check the existing issues in the repository
+2. Create a new issue with detailed information
+3. Refer to the individual README files in `client/` and `server/` directories
 
-1. **Database Connection Issues**
-   - Verify your `DATABASE_URL` is correct
-   - Ensure your database is running and accessible
-   - Check firewall settings
+## 🔗 Links
 
-2. **CORS Errors**
-   - Verify `FRONTEND_URL` and `BACKEND_URL` are correctly set
-   - Ensure both servers are running on the specified ports
-
-3. **Build Errors**
-   - Clear node_modules and reinstall: `rm -rf node_modules && pnpm install`
-   - Check TypeScript errors: `pnpm tsc --noEmit`
-
-## 📞 Support
-
-If you encounter any issues or have questions, please open an issue on GitHub.
+- [Client Documentation](./client/README.md)
+- [Server API Documentation](./server/)
+- [Database Schema](./server/src/db/schema.ts)
