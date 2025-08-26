@@ -1,10 +1,10 @@
 # Social Media Application
 
-A modern full-stack social media application built with Next.js, Fastify, tRPC, and PostgreSQL.
+A modern full-stack social media application built with Next.js, tRPC, and PostgreSQL.
 
 ## 🚀 Features
 
-- **User Authentication**: Secure authentication with Better Auth
+- **User Authentication**: Secure authentication
 - **Post Management**: Create, edit, delete, and view posts
 - **Comment System**: Interactive commenting with real-time updates
 - **Search Functionality**: Search posts by content and username
@@ -15,29 +15,28 @@ A modern full-stack social media application built with Next.js, Fastify, tRPC, 
 
 ## 🛠️ Tech Stack
 
-### Frontend
-- **Next.js 15** - React framework with App Router
+### Frontend & Backend
+- **Next.js 15** - Full-stack React framework with App Router
 - **React 19** - UI library
 - **TypeScript** - Type safety
-- **Tailwind CSS** - Styling
-- **Shadcn/ui** - UI components
-- **Lucide React** - Icons
-- **TanStack Query** - Data fetching and caching
 - **tRPC** - End-to-end typesafe APIs
-
-### Backend
-- **Fastify** - Fast and efficient web framework
-- **tRPC** - Type-safe API layer
-- **Better Auth** - Authentication system
+- **TanStack Query** - Data fetching and caching
 - **Drizzle ORM** - Type-safe database toolkit
 - **PostgreSQL** - Database (via Neon)
 - **Zod** - Schema validation
+
+### UI & Styling
+- **Tailwind CSS** - Utility-first CSS framework
+- **Shadcn/ui** - UI component library
+- **Radix UI** - Headless UI primitives
+- **Lucide React** - Icon library
+- **Class Variance Authority** - Component variants
 
 ### Development Tools
 - **ESLint** - Code linting
 - **TypeScript** - Static type checking
 - **Drizzle Kit** - Database migrations
-- **TSX** - TypeScript execution
+- **PostCSS** - CSS processing
 
 ## 📋 Prerequisites
 
@@ -50,7 +49,7 @@ A modern full-stack social media application built with Next.js, Fastify, tRPC, 
 ### 1. Clone the repository
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/khanhphan162/social-app/
 cd social-app
 ```
 
@@ -62,13 +61,13 @@ pnpm install
 
 ### 3. Environment Setup
 
-Copy the environment template:
+Create a `.env.local` file in the root directory with the following variables:
 
-```bash
-cp .env.sample .env
+```env
+# Database
+DATABASE_URL="postgresql://username:password@host:port/database"
+
 ```
-
-Fill in your environment variables in `.env` (see Environment Variables section below).
 
 ### 4. Database Setup
 
@@ -81,48 +80,21 @@ pnpm db:push
 
 ### 5. Development
 
-Start the development servers:
+Start the development server:
 
 ```bash
-# Terminal 1 - Backend server
-pnpm dev:server
-
-# Terminal 2 - Frontend server
-pnpm dev:client
+pnpm dev
 ```
 
-The application will be available at:
-- Frontend: http://localhost:3000
-- Backend API: http://localhost:4000
-
-## 🔧 Environment Variables
-
-Create a `.env` file in the root directory with the following variables:
-
-```env
-# Database
-DATABASE_URL="postgresql://username:password@host:port/database"
-
-# Server Configuration
-PORT=4000
-FRONTEND_URL="http://localhost:3000"
-BACKEND_URL="http://localhost:4000"
-
-```
+The application will be available at http://localhost:3000
 
 ## 📜 Available Scripts
 
 ### Development
-- `pnpm dev:server` - Start backend development server
-- `pnpm dev:client` - Start frontend development server
-
-### Building
-- `pnpm build:server` - Build backend for production
-- `pnpm build:front` - Build frontend for production
-
-### Production
-- `pnpm start:server` - Start production backend server
-- `pnpm start:client` - Start production frontend server
+- `pnpm dev` - Start Next.js development server
+- `pnpm build` - Build application for production
+- `pnpm start` - Start production server
+- `pnpm lint` - Run ESLint
 
 ### Database
 - `pnpm db:generate` - Generate database migrations
@@ -130,62 +102,73 @@ BACKEND_URL="http://localhost:4000"
 - `pnpm db:migrate` - Run database migrations
 - `pnpm db:studio` - Open Drizzle Studio (database GUI)
 
-### Code Quality
-- `pnpm lint` - Run ESLint
-
 ## 🏗️ Project Structure
+
+```
 src/
 ├── app/                    # Next.js App Router
-│   ├── (auth)/            # Authentication pages
+│   ├── (auth)/            # Authentication pages (login, register)
 │   ├── (home)/            # Main application pages
+│   ├── api/               # API routes
+│   │   ├── auth/          # Authentication endpoints
+│   │   └── trpc/          # tRPC API handler
+│   ├── globals.css        # Global styles
 │   └── layout.tsx         # Root layout
 ├── components/            # Reusable UI components
+│   ├── modals/           # Modal components
 │   └── ui/               # Shadcn/ui components
 ├── db/                   # Database configuration
 │   ├── index.ts          # Database connection
 │   └── schema.ts         # Database schema
 ├── hooks/                # Custom React hooks
+│   ├── use-mobile.ts     # Mobile detection hook
+│   └── use-session.ts    # Session management hook
 ├── lib/                  # Utility libraries
+│   ├── auth-client.ts    # Authentication client
+│   └── utils.ts          # General utilities
 ├── modules/              # Feature modules
 │   ├── auth/            # Authentication module
+│   │   └── ui/          # Auth-specific UI components
 │   └── home/            # Home/feed module
+│       ├── contexts/    # Home-specific contexts
+│       └── ui/          # Home-specific UI components
 ├── providers/           # React context providers
-├── server/              # Backend server code
-│   ├── api/            # API handlers
-│   ├── handlers/       # Route handlers
+│   └── session-provider.tsx # Session context provider
+├── server/              # Server-side code
+│   ├── api/            # API route handlers
+│   ├── context.ts      # tRPC context creation
+│   ├── init.ts         # tRPC initialization
 │   ├── lib/           # Server utilities
-│   ├── router/        # tRPC routers
-│   └── index.ts       # Server entry point
+│   │   └── auth.ts    # Server-side auth utilities
+│   └── router/        # tRPC routers
+│       ├── commentRouter.ts # Comment operations
+│       ├── healthRouter.ts  # Health check
+│       ├── index.ts         # Main router
+│       ├── postRouter.ts    # Post operations
+│       ├── sessionRouter.ts # Session management
+│       └── userRouter.ts    # User operations
 └── trpc/               # tRPC client configuration
-
+├── client.tsx      # tRPC React client
+└── query-client.ts # TanStack Query client
+```
 
 ## 🔐 Authentication
 
 - Username-based authentication
-- Session management
+- Secure session management with HTTP-only cookies
 - Role-based access control (user/admin)
-- Secure password hashing
+- Secure password hashing with bcrypt
+- Session refresh and logout functionality
 
-## 🗄️ Database Schema
+## 🔧 Environment Variables
 
-The application uses PostgreSQL with the following main entities:
-- **Users**: User accounts and profiles
-- **Posts**: User posts/content
-- **Comments**: Post comments
-- **Sessions**: Authentication sessions
+Required environment variables:
 
-## 🚀 Deployment
+```env
+# Database
+DATABASE_URL="postgresql://username:password@host:port/database"
 
-### Backend Deployment
-1. Build the server: `pnpm build:server`
-2. Set production environment variables
-3. Run migrations: `pnpm db:migrate`
-4. Start the server: `pnpm start:server`
-
-### Frontend Deployment
-1. Build the frontend: `pnpm build:front`
-2. Deploy to your preferred platform (Vercel, Netlify, etc.)
-3. Update environment variables for production URLs
+```
 
 ## 🤝 Contributing
 
@@ -195,10 +178,6 @@ The application uses PostgreSQL with the following main entities:
 4. Push to the branch: `git push origin feature/amazing-feature`
 5. Open a Pull Request
 
-## 📝 License
-
-This project is licensed under the MIT License.
-
 ## 🐛 Troubleshooting
 
 ### Common Issues
@@ -206,15 +185,21 @@ This project is licensed under the MIT License.
 1. **Database Connection Issues**
    - Verify your `DATABASE_URL` is correct
    - Ensure your database is running and accessible
-   - Check firewall settings
+   - Check firewall settings for Neon or your PostgreSQL instance
 
-2. **CORS Errors**
-   - Verify `FRONTEND_URL` and `BACKEND_URL` are correctly set
-   - Ensure both servers are running on the specified ports
-
-3. **Build Errors**
+2. **Build Errors**
    - Clear node_modules and reinstall: `rm -rf node_modules && pnpm install`
-   - Check TypeScript errors: `pnpm tsc --noEmit`
+   - Check TypeScript errors: `npx tsc --noEmit`
+   - Ensure all environment variables are set
+
+3. **tRPC Errors**
+   - Check browser network tab for API errors
+   - Verify tRPC context is properly configured
+   - Ensure database schema is up to date
+
+## 📝 License
+
+This project is licensed under the MIT License.
 
 ## 📞 Support
 
