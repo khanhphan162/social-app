@@ -136,7 +136,7 @@ const AuthenticatedContent = ({ user }: AuthenticatedContentProps) => {
                 </div>
             )}
 
-            {/* Create post form (only show when not searching) */}
+            {/* Create post */}
             {!searchQuery && <CreatePost user={user} />}
 
             {/* Posts */}

@@ -57,8 +57,8 @@ const CreatePost = ({ user }: CreatePostProps) => {
     };
 
     return (
-        <Card className="mb-6">
-            <CardContent className="pt-6">
+        <Card className="mb-4 py-4">
+            <CardContent>
                 <div className="space-y-4">
                     <div className="flex space-x-4">
                         <Avatar className="h-10 w-10 flex-shrink-0">
@@ -74,14 +74,14 @@ const CreatePost = ({ user }: CreatePostProps) => {
                                 maxLength={2000}
                             />
                             {content.length > 1900 && (
-                                <p className="text-sm text-gray-500 mt-2">
+                                <p className="text-sm text-gray-500 mt-1">
                                     {2000 - content.length} characters remaining
                                 </p>
                             )}
                         </div>
                     </div>
                 </div>
-                <div className="flex items-center justify-between border-t pt-4">
+                <div className="flex items-center justify-between border-t pt-2">
                     <div className="flex-1" />
                     <Button
                         className="flex items-center bg-blue-500 hover:bg-blue-600"
