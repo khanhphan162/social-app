@@ -50,7 +50,7 @@ A modern full-stack social media application built with Next.js, Fastify, tRPC, 
 ### 1. Clone the repository
 
 ```bash
-git clone <repository-url>
+gh repo clone khanhphan162/social-app
 cd social-app
 ```
 
@@ -134,6 +134,7 @@ BACKEND_URL="http://localhost:4000"
 - `pnpm lint` - Run ESLint
 
 ## 🏗️ Project Structure
+```
 src/
 ├── app/                    # Next.js App Router
 │   ├── (auth)/            # Authentication pages
@@ -157,7 +158,7 @@ src/
 │   ├── router/        # tRPC routers
 │   └── index.ts       # Server entry point
 └── trpc/               # tRPC client configuration
-
+```
 
 ## 🔐 Authentication
 
